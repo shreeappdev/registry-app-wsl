@@ -73,7 +73,7 @@
                             <div class="col-md-3">
                                 <label for="region" class="form-label">Select Region</label>
                                 <select id="region" class="form-control @error('region') is-invalid @enderror" wire:model.live="region">
-                                    <option selected>Choose...</option>
+                                    <option selected>...Select...</option>
 
                                     <option value=1>Central</option>
                                     <option value=2>State</option>
