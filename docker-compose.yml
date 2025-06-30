@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+    # PHP Service container (now with Apache built-in)
+    laravel_eleven_app:
+        build:
+            args:
+                user: laravel_eleven_user
+                uid: 1000
+            context: ./ # Build context is the current directory (where docker-compose.yml is)
+            dockerfile: Dockerfile
+        image: laravel_eleven_app_image
+        container_name: laravel_eleven_app
+        restart: unless-stopped
+        depends_on:
+            - laravel_eleven_app_mysql
+        volumes:
+            # Mount your Laravel project to Apache's default root
+            - ./registry:/var/www/html
+            # Mount your custom Apache Virtual Host configuration
+            - ./docker-compose/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+        ports:
+            - "8080:80" # Map host port 8001 to container's Apache port 80
+        networks:
+            - laravel_eleven_app_network
+        # --- FIX: Enable the Apache virtual host via command ---
+    
+    laravel_eleven_app_mysql:
+        image: mysql:5.7.22
+        container_name: laravel_eleven_app_mysql_container
+        restart: unless-stopped
+        ports:
+            - "3337:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: registry
+            MYSQL_USER: root
+            MYSQL_PASSWORD: password # Ensure this is 'password' if that's what you want
+        volumes:
+            - laravel_eleven_mysql_data:/var/lib/mysql
+        networks:
+            - laravel_eleven_app_network
+
+    laravel_eleven_phpmyadmin:
+        image: phpmyadmin:5.2.1-apache
+        container_name: laravel_eleven_phpmyadmin_container
+        restart: unless-stopped
+        ports:
+            - "8383:80"
+        environment:
+            PMA_HOST: laravel_eleven_app_mysql
+            PMA_PORT: 3306
+            PMA_USER: root
+            PMA_PASSWORD: password
+        depends_on:
+            - laravel_eleven_app_mysql
+        networks:
+            - laravel_eleven_app_network
+
+volumes:
+    laravel_eleven_mysql_data:
+        driver: local
+
+networks:
+    laravel_eleven_app_network:
+        driver: bridge
