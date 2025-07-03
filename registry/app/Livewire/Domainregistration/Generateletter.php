@@ -10,9 +10,9 @@ use App\Models\Ministry;
 use App\Models\Department;
 use App\Models\Orgcategory;
 use App\Models\NodalOfficers;
+use App\Models\Organisation;
 use Livewire\Attributes\Title;
-use Barryvdh\DomPDF\Facade\PDF;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class Generateletter extends Component
 {
 
@@ -24,7 +24,7 @@ class Generateletter extends Component
     public $nodaloffiers;
     public $nodalofficerid;
 
-    #[Title('Subdomain Registration')]
+    #[Title('Generate Registration Letter')]
     public function mount()
     {
 
@@ -106,7 +106,7 @@ class Generateletter extends Component
             $orgcontactDetails = Contact::where('contactid', $domaindetails->companyid)->first()? : [];
             $admincontactDetails = Contact::where('contactid', $domaindetails->adminid)->first()? : [];
             $region = $domaindetails->region == 1 ? 'Central' : 'State';
-            $organisationdetails = !empty($domaindetails->org_id) ? Department::where('org_id', $domaindetails->org_id)->first() : "No Organistion Name";
+            $organisationdetails = !empty($domaindetails->org_id) ? Organisation::where('org_id', $domaindetails->org_id)->first() : "No Organistion Name";
 
             if (empty($orgcontactDetails)) {
 
@@ -154,7 +154,7 @@ class Generateletter extends Component
             'orgcategory' => $orgcategory->orgcat,
             'ministry' => $ministry->m_name,
             'department' => !empty($domaindetails->dept) ? $departmentdetails->name : "No Department",
-            'state' => $state->state_utname,
+            'state' => $domaindetails->region==2  ? $state->state_utname:"",
             'region' => $region,
             'organisationName' => !empty($domaindetails->org_id) ? $organisationdetails->org_name : "No Organisation",
         ];
@@ -168,7 +168,7 @@ class Generateletter extends Component
         }else{
 
             // Load the view and pass the data to it
-            $pdf = PDF::loadView('livewire.userdashboard.domainregistration.letterformat', array_merge($data, $data__admin, $data__org));
+            $pdf = Pdf::loadView('livewire.userdashboard.domainregistration.letterformat', array_merge($data, $data__admin, $data__org));
 
             // Return the generated PDF for download or inline display
             // return $pdf->download('document.pdf');
@@ -178,7 +178,7 @@ class Generateletter extends Component
 
         
             // Save the PDF in the public storage folder
-            $path = storage_path("app/public/{$filename}");
+            $path = storage_path("app/public/registrationletters/{$filename}");
             $pdf->save($path);
 
             $this->dispatch('regletterGenerated',type:'success',title:'Letter Generated',text:$domaindetails->domainname,date:date('Y-m-d'),html:"<p>Annexure I and II has been generated successfuly.Download the lettes</p>");

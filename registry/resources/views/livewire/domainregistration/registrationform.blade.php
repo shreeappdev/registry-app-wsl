@@ -16,7 +16,7 @@
                         <div class="form-group">
                         <div class="col-md-4">
                             <label for="language" class="form-label">Select language</label>
-                            <select id="language" class="form-control custom-select @error('language') is-invalid @enderror"
+                            <select id="language" class="form-control custom-select @error('language_code') is-invalid @enderror"
                                 wire:model.live="language_code">
                                 <option>Choose...</option>
                                 @foreach ($languages as $key => $language)
@@ -26,7 +26,7 @@
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">
-                                @error('language')
+                                @error('language_code')
                                     {{ $message }}
                                 @enderror
                             </div>
@@ -74,7 +74,6 @@
                                 <label for="region" class="form-label">Select Region</label>
                                 <select id="region" class="form-control @error('region') is-invalid @enderror" wire:model.live="region">
                                     <option selected>...Select...</option>
-
                                     <option value=1>Central</option>
                                     <option value=2>State</option>
                                 </select>
@@ -162,7 +161,7 @@
                                     @if (count($departments) < 1)
                                         <option value="0" selected>No data</option>
                                     @else
-                                        <option selected>Choose...</option>
+                                        <option value="0" selected>Choose...</option>
                                         @foreach ($departments as $key => $department)
                                             <option value={{ $department->id }}>{{ $department->name }}</option>
                                         @endforeach
@@ -180,15 +179,17 @@
                        <div class="form-group row g-3">
                             <div class="col-md-6">
                                 <label for="organisation" class="form-label">Select Organisation</label>
-                                <select id="organisation" class="form-control @error('selectedOrganisation') is-invalid @enderror"
+                                <select  class="form-control @error('selectedOrganisation') is-invalid @enderror"
                                     wire:model="selectedOrganisation">
                                    
                                     @if(count($organisations) < 1)
                                         <option value="0" selected>No data</option>
+                                    @else
+                                        <option>Choose..</option>
+                                        @foreach ($organisations as $key => $organisation)
+                                            <option value={{ $organisation->org_id }}>{{ $organisation->org_name }}</option>
+                                        @endforeach
                                     @endif
-                                    @foreach ($organisations as $key => $organisation)
-                                        <option value={{ $organisation->org_id }}>{{ $organisation->org_name }}</option>
-                                    @endforeach
                                 </select>
                                 <div class="invalid-feedback">
                                     @error('selectedOrganisation')
@@ -201,13 +202,13 @@
 
                          <div class="col-md-6">
                             <label for="addnewOrganisation" class="form-label">Add Organisation</label>
-                            <input type="text" id="addnewOrganisation" class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model="addnewOrganisation">
-                            <div class="invalid-feedback">
+                            <input type="text"  class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model="addnewOrganisation">
                                 @error('addnewOrganisation')
-                                    {{ $message }}
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
-                            </div>
-                        </div>
+                           </div>
                         @endif
                      </div>
                     </div>
@@ -301,8 +302,20 @@
                         </div>
                         <div class="form-group row g-3">
 
+                            <label for="orgstdcode" class="form-label">Telephone</label>
                              
-                            <label for="orginputState" class="form-label">Telephone</label>
+
+                                    <div class="col-md-2">
+                                        <label for="orgcountrydialcode" class="visually-hidden">Country Code</label>
+                                        <input type="text" id="orgcountrydialcode" class="form-control @error('orgcountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model="orgcountrydialcode" aria-describedby="orgcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                        <div class="invalid-feedback">
+                                            @error('orgcountrydialcode')
+                                                {{ $message }}
+                                            @enderror
+                                        </div>
+                                    </div>
+                              
+                            
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
                                 <input type="text" class="form-control @error('orgstdcode') is-invalid @enderror"
@@ -449,7 +462,19 @@
                         <div class="form-group row g-3">
 
                             
-                            <label for="orginputState" class="form-label">Telephone</label>
+                            <label for="adminstdcode" class="form-label">Telephone</label>
+
+                                <div class="col-md-2">
+                                    <label for="orgcountrydialcode" class="visually-hidden">Country Code</label>
+                                    <input type="text" id="adminstdcode" class="form-control @error('admincountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}"  wire:model="admincountrydialcode" aria-describedby="admincountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+
+                                    <div class="invalid-feedback">
+                                        @error('admincountrydialcode')
+                                            {{ $message }}
+                                        @enderror
+                                    </div>
+                                </div>
+                              
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
                                 <input type="text"
@@ -592,7 +617,18 @@
                         </div>
 
                         <div class="form-group row g-3">
-                            <label for="orginputState" class="form-label">Telephone</label>
+                            <label for="techstdcode" class="form-label">Telephone</label>
+
+                            <div class="col-md-2">
+                                    <label for="techcountrydialcode" class="visually-hidden">Country Code</label>
+                                    <input type="text" id="techstdcode" class="form-control @error('techcountrydialcode') is-invalid @enderror"  placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model="techcountrydialcode" aria-describedby="techcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                       
+                                    <div class="invalid-feedback">
+                                        @error('techcountrydialcode')
+                                            {{ $message }}
+                                        @enderror
+                                    </div>
+                                </div>
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
                                 <input type="text" class="form-control @error('techstdcode') is-invalid @enderror"

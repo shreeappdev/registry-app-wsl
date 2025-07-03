@@ -16,9 +16,9 @@ use App\Models\Orgcategory;
 use App\Models\Organisation;
 use Livewire\Attributes\Title;
 use App\Models\Nameserver_data;
-use App\Models\StdCodes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Rules\SelectedDepartmentRequired;
 
 class Registrationform extends Component
 {
@@ -31,7 +31,7 @@ class Registrationform extends Component
     public $hindidomainname;
     public $state_domain;
     public $region;
-    public $isaddOrganisation;
+    public $isaddOrganisation=false;
 
 
     /**Multi dropdown */
@@ -44,6 +44,7 @@ class Registrationform extends Component
     public $selectedMinistry=null;
     public $selectedDepartment=null;
     public $selectedOrganisation=null;  
+    public $addnewOrganisation = '';
     
     /** Second step */
    
@@ -58,6 +59,7 @@ class Registrationform extends Component
     public $orgstdcode;
     public $orgmobileNo;
     public $orgemailid;
+    public $orgcountrydialcode;
 
     /** Third step */
    
@@ -72,6 +74,7 @@ class Registrationform extends Component
     public $adminstdcode;
     public $adminmobileNo;
     public $adminemailid;
+    public $admincountrydialcode;
 
     /** Fourth step */
 
@@ -86,6 +89,9 @@ class Registrationform extends Component
     public $techstdcode;
     public $techmobileNo;
     public $techEmailid;
+    public $techcountrydialcode;
+
+
     public $isChecked=true;
     public $isdepartmentVisible;
     public $multipleip= [];
@@ -96,12 +102,13 @@ class Registrationform extends Component
     public $currentStep=1;
 
     #[Title('Domain Registration')]
+
         public function mount(){
 
-            $this->currentStep = 2;
+            $this->currentStep = 1;
             $this->multipleip = ['nshostname' => '', 'ip' => []];
-            $this->isaddOrganisation = false;
-             $this->isdepartmentVisible = false;
+          //  $this->isaddOrganisation = false;
+            $this->isdepartmentVisible = false;
         }
 
         public function increaseStep(){
@@ -125,6 +132,8 @@ class Registrationform extends Component
 
       public function validateData(){
 
+ 
+
         if( $this->currentStep == 1){
                 $this->validate([
                     'region'=>'required',
@@ -132,106 +141,145 @@ class Registrationform extends Component
                     'domainname'=>['required',new DomainRule()],
                     'hindidomainname'=>'required',
                     'selectedOrgcategory'=>'required',
-                    'selectedMinistry'=>'required_if:region,1 ',
+                    'selectedMinistry'=>'required_if:region,1',
                     'state_domain'=>'required_if:region,2',
-                ],
+                    'selectedDepartment'=>[new SelectedDepartmentRequired($this->selectedOrgcategory)],       
+                 ],
                 [
+                    'region.required' => 'Please select region',
+                    'language_code.required' => 'Please select language',
+                    'domainname.required' => 'Domain name is required',
+                    'domainname.regex' => 'Domain name should be in format',
+                    'hindidomainname.required' => 'Hindi Domain name is required',
+                    'hindidomainname.regex' => 'Hindi Domain name should be in format',
+                    'selectedMinistry.required_if'=>'Please select ministry in case of selected region is Central',
+                    'state_domain.required_if'=>'Please select state in case of selected region is State/UT',
                     'selectedOrgcategory.required' => 'Organisation Category is required',
-                    'hindidomainname.required' => 'Hindi Domain name in required',
                     'language.required' => 'Please choose language of domain',
                     'selectedMinistry.required_if'=>'Please select ministry',
-                    'state_domain.required_if'=>'Please select state'
+                    'state_domain.required_if'=>'Please select state',
                 ]);
-        }
+
+                if (empty($this->selectedOrganisation) && empty($this->addnewOrganisation)) {
+
+                    if (count($this->organisations) > 0) {
+                        $this->validate([
+                            'selectedOrganisation' => 'required',
+                        ], [
+                            'selectedOrganisation.required' => 'Please select an organisation from the list',
+                        ]);
+                    } else {
+                        $this->validate([
+                            'addnewOrganisation' => 'required|regex:/^[a-zA-Z\s]+$/',
+                        ], [
+                            'addnewOrganisation.required' => 'Organisation name is required',
+                            'addnewOrganisation.regex' => 'Only character and space is allowed',
+                        ]);
+                    }
+                }
+            }
         if( $this->currentStep == 2){
 
             $this->validate([
                 'orgName'=>'required',
                 'orgDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                'orgmobileNo'=>['required','regex:/^(\+?\d{1,3})?\d{10}$/'],
+                'orgmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
                 'orgemailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
                 'orgCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
                 'orgState'=>'required',
                 'orgPincode'=>'required |min:6 |numeric',
-                'orgTelehponeNo'=>'required|numeric|max:8|min:8',
-                'orgstdcode'=>'required|numeric |max:4|min:2',
-                'orgAddress1'=>'required'
-            
+                'orgTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
+                'orgstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
+                'orgAddress1'=>'required',
+             
             ],
             [
                 'orgName.required' => 'Name is required',
-                'orgDesignation.required' => 'Designation is required',
                 'orgCity.required' => 'City is required',
                 'orgState.required' => 'State is required',
                 'orgPincode.required' => 'Pincode is required',
-                'orgTelehponeNo.required' => 'Telephone No is required',
-                'orgmobileNo.required' =>'Mobile No is required',
-                'orgemailid.required' =>'Email id is required',
                 'orgAddress1.required' =>'Address is required',
+                'orgDesignation.required' => 'Designation is required',
                 'orgDesignation.regex'=>'Only character and space is allowed',
+                'orgemailid.required' =>'Email id is required',
                 'orgemailid.regex'=>'Email id will be @nic.in or @gov.in',
+                'orgTelehponeNo.required' => 'Telephone No is required',
+                'orgTelehponeNo.regex'=>'Telephone No should be minimum 4 digits and maximum 8 digits',
                 'orgstdcode.required'=>'Please enter STD code',
-                'orgstdcode.max'=>'STD code should be 4 digit',
-                'orgstdcode.min'=>'STD code should be minimum 2 digit',
-                'orgTelehponeNo.max'=>'Telephone No should be 8 digit',
-                'orgTelehponeNo.min'=>'Telephone No should be 8 digit',
-                'orgstdcode.numeric'=>'Neumeric value is required for STD code',
-      
-            
+                'orgstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
+                'orgmobileNo.required' =>'Mobile No is required',
+                'orgmobileNo.regex'=>'The mobile number must be 10 digits and should not start with 0',
+              
+              
             ]);
+
+
+            if ($this->selectedMinistry == 14) {
+                $this->validate([
+                    'orgcountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
+                ], [
+                    'orgcountrydialcode.required' => 'Please enter country code',
+                    'orgcountrydialcode.regex' => 'Country code should be in format',
+                ]);
+            }   
         }
         if( $this->currentStep == 3){
             
                 $this->validate([
                     'adminName'=>'required',
                     'adminDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                    'adminmobileNo'=>['required','regex:/^(\+?\d{1,3})?\d{10}$/'],
+                    'adminmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
                     'adminemailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
                     'adminCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
                     'adminState'=>'required',
                     'adminPincode'=>'required|min:6|numeric',
-                    'adminTelehponeNo'=>'required|numeric|max:8|min:8',
-                    'adminstdcode'=>'required|numeric |max:4|min:2',
-                    'adminAddress1' =>'required'
+                    'adminTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
+                    'adminstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
+                    'adminAddress1' =>'required',
                 
                 ],
                 [
                     'adminName.required' => 'Name is required',
-                    'adminDesignation.required' => 'Designation is required',
                     'adminCity.required' => 'City is required',
                     'adminState.required' => 'State is required',
                     'adminPincode.required' => 'Pincode is required',
-                    'adminTelehponeNo.required' => 'Telephone No is required',
-                    'adminmobileNo.required' =>'Mobile No is required',
-                    'adminemailid.required' =>'Email id is required',
                     'adminAddress1.required' =>'Address is required',
-                    'adminemailid.different'=>'The organisation emailid and Administrative emial id should not be same',
+                    'adminDesignation.required' => 'Designation is required',
                     'adminDesignation.regex'=>'Only character and space is allowed',
                     'adminemailid.regex'=>'Email id will be @nic.in or @gov.in',
+                    'adminemailid.different'=>'The organisation emailid and Administrative emial id should not be same',
+                    'adminemailid.required' =>'Email id is required',
+                    'adminTelehponeNo.required' => 'Telephone No is required',
+                    'adminTelehponeNo.regex' => 'Telephone No should be minimum 4 digits and maximum 8 digits',
                     'adminstdcode.required'=>'Please enter STD code',
-                    'adminstdcode.max'=>'STD code should be 4 digit',
-                    'adminstdcode.min'=>'STD code should be minimum 2 digit',
-                    'adminTelehponeNo.max'=>'Telephone No should be 8 digit',
-                    'adminTelehponeNo.min'=>'Telephone No should be 8 digit',
-                    'adminstdcode.numeric'=>'Neumeric value is required for STD code',
-    
-
-                
+                    'adminstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
+                    'adminmobileNo.regex'=>'Mobile No should be 10 digit and ot start with 0 ',
+                    'adminmobileNo.required' =>'Mobile No is required',
+             
                 ]);
+
+                    if ($this->selectedMinistry == 14) {
+                        $this->validate([
+                            'admincountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
+                        ], [
+                            'admincountrydialcode.required' => 'Please enter country code',
+                            'admincountrydialcode.regex' => 'Country code should be in format',
+                        ]);
+                    }
             }
         if( $this->currentStep == 4){
 
             $this->validate([
                 'techName'=>'required',
                 'techDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                'techmobileNo'=>['required','regex:/^(\+?\d{1,3})?\d{10}$/'],
+                'techmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
                 'techEmailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
                 'techCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
                 'techState'=>'required',
                 'techPincode'=>'required|min:6|numeric',
-                'techTelehponeNo'=>'required| numeric|max:8|min:8',
-                'techstdcode'=>'required|numeric |max:4|min:2',
-                'techAddress1' =>'required'
+                'techTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
+                'techstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
+                'techAddress1' =>'required',
             
             ],
             [
@@ -240,19 +288,28 @@ class Registrationform extends Component
                 'techCity.required' => 'City is required',
                 'techState.required' => 'State is required',
                 'techPincode.required' => 'Pincode is required',
-                'techTelehponeNo.required' => 'Telephone No is required',
-                'techmobileNo.required' =>'Mobile No is required',
-                'techEmailid.required' =>'Email id is required',
                 'techAddress1.required' =>'Address is required',
                 'techDesignation.regex'=>'Only character and space is allowed',
+                'techEmailid.required' =>'Email id is required',
                 'techEmailid.regex'=>'Email id will be @nic.in or @gov.in',
+                'techTelehponeNo.required' => 'Telephone No is required',
+                'techTelehponeNo.regex' => 'Telephone No should be minimum 4 digits and maximum 8 digits',
+                'techmobileNo.required' =>'Mobile No is required',
+                'techmobileNo.regex' => 'Mobile No should be minimum 10 digits and should not start with 0',
                 'techstdcode.required'=>'Please enter STD code',
-                'techTelehponeNo.max'=>'Telephone No should be 8 digit',
-                'techTelehponeNo.min'=>'Telephone No should be 8 digit',
-                'techstdcode.numeric'=>'Neumeric value is required for STD code',
-
+                'techstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
+                
             
             ]);
+            
+                if ($this->selectedMinistry == 14) {
+                    $this->validate([
+                        'techcountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
+                    ], [
+                        'techcountrydialcode.required' => 'Please enter country code',
+                        'techcountrydialcode.regex' => 'Country code should be in format',
+                    ]);
+                }
         } 
         if( $this->currentStep == 5){
 
@@ -303,8 +360,6 @@ class Registrationform extends Component
     public function register(){
 
             $this->validateData();
-
-            dd($this->multipleip);
             try {
                 DB::beginTransaction();
              
@@ -329,7 +384,7 @@ class Registrationform extends Component
                         'registrationdate' => $currentDate,
                         'state_utcode' =>  $this->state_domain,
                         'orgcategory' => $this->selectedOrgcategory,
-                        'region' => $this->region,
+                        'region' => $this->region ==1?'cu':$this->state_domain,
                         'ministry' => $this->selectedMinistry,
                         'dept' => $this->selectedDepartment,
                         'org_id' => $this->selectedOrganisation,
@@ -347,60 +402,71 @@ class Registrationform extends Component
                         'lang'=>'hin-deva'
                     ]);
 
+                    /**Add organisation if exixts */
+
+                    if(!empty($this->addnewOrganisation)){
+
+                        Organisation::insert([
+                            'org_name'=> $this->addnewOrganisation,
+                            'm_id'=>$this->selectedMinistry,
+                            'dept_id'=>$this->selectedDepartment,
+                            'orgcat_id'=>$this->selectedOrgcategory,
+                            'state_utcode'=>$this->region == 2 ? $this->state_domain : 'cu',
+                        ]);
+                    }
+
+
                     //insert in Organistion contacts
-                    $orgcname= $this->orgName.",".$this->orgDesignation;
-                    $organisationContacttel='+91.'.$this->orgstdcode."-".$this->orgTelehponeNo;
-                  
+                
                     Contact::create([
                             'contactid'=>$organisationcontact,
-                            'c_name' => $orgcname,
+                            'c_name' => $this->orgName,
+                            'designation' => $this->orgDesignation,
                             'address1' => $this->orgAddress1,
                             'address2' => $this->orgAddress2,
                             'city' => $this->orgCity,
                             'state' => $this->orgState,
                             'countryid' => 'India',
                             'pincode' => $this->orgPincode,
-                            'telephone' => $organisationContacttel,
+                            'telephone_std_code' => $this->orgstdcode,
+                            'telephone' => $this->orgTelehponeNo,
                             'mobileno' => $this->orgmobileNo,
                             'email' => $this->orgemailid,
                          ]);
 
                         
                      //insert in Admin contacts
-                   
-                     $admincname= $this->adminName.",".$this->adminDesignation;
-                     $adminContacttel='+91.'.$this->adminstdcode."-".$this->adminTelehponeNo;
-
+         
                    Contact::create([
                         'contactid'=>$admincontact,
-                        'c_name' => $admincname,
+                        'c_name' => $this->adminName,
+                        'designation' => $this->adminDesignation,
                         'address1' => $this->adminAddress1,
                         'address2' => $this->adminAddress2,
                         'city' => $this->adminCity,
                         'state' => $this->adminState,
                         'countryid' => 'India',
                         'pincode' => $this->adminPincode,
-                        'telephone' => $adminContacttel,
+                        'telephone_std_code' => $this->adminstdcode,
+                        'telephone' => $this->adminTelehponeNo,
                         'mobileno' => $this->adminmobileNo,                    
-                         'email' => $this->adminemailid
+                        'email' => $this->adminemailid
                     ]);
 
 
                     //insert in Technical contacts
 
-                    $techcname= $this->techName.",".$this->techDesignation;
-                    $techcontacttel='+91.'.$this->techstdcode."-".$this->techTelehponeNo;
-
                    Contact::create([
                         'contactid'=>$techcontact,
-                        'c_name' => $techcname,
+                        'c_name' => $this->techName,
                         'address1' => $this->techAddress1,
                         'address2' => $this->techAddress2,
                         'city' => $this->techCity,
                         'state' => $this->techState,
                         'countryid' => 'India',
                         'pincode' => $this->techPincode,
-                        'telephone' => $techcontacttel,
+                        'telephone_std_code' => $this->techstdcode,
+                        'telephone' => $this->techTelehponeNo,
                         'mobileno' => $this->techmobileNo,
                         'email' => $this->techEmailid,
                     ]);
@@ -463,9 +529,15 @@ class Registrationform extends Component
             ? $orgCategory
             : 0;       
             $this->ministries = Ministry::where('orgcatid','=',$orgcat)->get();
-            $this->selectedMinistry = null;
             $this->isaddOrganisation = $getorgcatRow->add_organisation == 1 ? true : false;
             $this->isdepartmentVisible = $getorgcatRow->dept_is_visible == 1 ? true : false; 
+            $this->selectedMinistry = null;
+            $this->selectedDepartment = null;
+            $this->selectedOrganisation = null;
+            $this->departments = [];
+            $this->organisations = [];
+          
+    
         }
     
        
@@ -473,15 +545,33 @@ class Registrationform extends Component
         {
 
             $this->departments = Department::where('m_id','=',$ministry)->get();
-            $this->selectedDepartment = null;
+
+            if(!$this->isdepartmentVisible){
+                $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
+                ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
+            }else{
+               $this->organisations = [];
+               $this->selectedOrganisation = null;
+            }
+          
+            $this->selectedDepartment = null;           
+           
         }
 
         public function updatedselectedDepartment($department)
         {
-            $this->organisations = Organisation::where('dept_id','=',$department)
-                                                ->where('m_id','=', $this->selectedMinistry)
-                                                ->where('orgcat_id','=',$this->selectedOrgcategory)->get();
-            $this->selectedOrganisation = null;
+
+           $query = Organisation::query();
+
+            if ($department > 0 || $department != null) {
+                $query->where('dept_id', '=', $department);
+            }
+
+            $query->where('m_id', '=', $this->selectedMinistry)
+                ->where('orgcat_id', '=', $this->selectedOrgcategory);
+
+            $this->organisations = $query->get();
+                    
         }
         
    
