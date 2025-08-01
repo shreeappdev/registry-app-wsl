@@ -115,4 +115,12 @@ class CustomHelper
 		}
 		return 1;
 	}
+
+    public static function generateCode()
+    {
+        $today = now()->format('Ymd');
+        $code = $today . mt_rand(1000, 9999);
+
+        return $code;
+    }
 }

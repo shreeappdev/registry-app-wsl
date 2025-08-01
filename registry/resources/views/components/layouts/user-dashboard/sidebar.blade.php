@@ -113,7 +113,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#collapseCancel" data-bs-toggle="collapse" href="#collapseCancel"
+                <a class="nav-link" href="#collapseCancel" data-bs-toggle="collapse"
                     role="button" aria-expanded="false" aria-controls="collapseCancel">
                     <div
                         class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
@@ -151,7 +151,7 @@
                 
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#collapseSubDomain" data-bs-toggle="collapse" href="#collapseSubDomain"
+                <a class="nav-link" href="#collapseSubDomain" data-bs-toggle="collapse"
                     role="button" aria-expanded="false" aria-controls="collapseSubDomain">
                     <div
                         class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
@@ -181,8 +181,10 @@
                 </a>
                 <div class="collapse" id="collapseSubDomain">
                     <div class="bg-white d-flex flex-column mb-3 rounded">
-                        <a class="collapse-item" wire:navigate href="{{ route('subdomain_registration') }}">Registration</a>
+                         <a class="collapse-item" wire:navigate href="{{ route('subdomain_registration') }}">Registration</a>
+                         <a class="collapse-item" wire:navigate href="{{ route('bulksubdomain_register') }}">Multiple Registration</a>
                         <a class="collapse-item" wire:navigate href="{{ route('manage_subdomain') }}">Manage Subdomain</a>
+                        <a class="collapse-item" wire:navigate href="">Multiple Deactivation</a>
                     </div>
                 </div>
             </li>
@@ -219,7 +221,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#collapseStatus" data-bs-toggle="collapse" href="#collapseStatus"
+                <a class="nav-link" href="#collapseStatus" data-bs-toggle="collapse"
                     role="button" aria-expanded="false" aria-controls="collapseStatus">
                     <div
                         class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">

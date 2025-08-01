@@ -23,6 +23,6 @@ class ManageSubdomainLists extends Component
     {
   
         $subdomains= Subdomain::where('domainid',$this->domain)->get();
-        return view('livewire.Subdomain.manage-subdomain-lists',['subdomains'=>$subdomains]);
+        return view('livewire.subdomain.manage-subdomain-lists',['subdomains'=>$subdomains]);
     }
 }

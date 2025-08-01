@@ -3,7 +3,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Submit letter</h1>
     </div>
-    <form method="POST" wire:submit.prevent='geneerateLetter'>
+    <form method="POST" wire:submit.prevent='generateLetter'>
         @csrf
 
         @if (session()->has('failed'))

@@ -8,22 +8,22 @@ use App\Livewire\Mydomain\ContactUpdate;
 use App\Livewire\Mydomain\DomainDetails;
 use App\Livewire\Subdomain\SubdomainEdit;
 use App\Livewire\Domaincancel\Domaincancel;
-use App\Livewire\Domaincancel\DomaincancelStatus;
 use App\Livewire\Subdomain\ManageSubdomain;
 use App\Livewire\Subdomain\Subdomaindetails;
+use App\Livewire\Mydomain\ContactUpdateStatus;
+use App\Livewire\Subdomain\MultipleSubdomainRegistration;
+use App\Livewire\Nameserver\EditNameserverForm;
 use App\Livewire\Subdomain\SubdomainDeactivate;
 use App\Livewire\Subdomain\ManageSubdomainLists;
+use App\Livewire\Domaincancel\DomaincancelStatus;
 use App\Livewire\Subdomain\SubdomainRegistration;
 use App\Livewire\Domainregistration\Generateletter;
 use App\Livewire\Domainregistration\Registrationform;
-use App\Livewire\DomainTransfer\DomainTransferLetterSubmit;
-use App\Livewire\Subdomain\MultipleSubdomainRegister;
+use App\Livewire\DomainTransfer\DomainTransferStatus;
 use App\Livewire\Domaincancel\SubmitDomainCancelLetter;
 use App\Livewire\DomainTransfer\GenerateTransferLetter;
+use App\Livewire\DomainTransfer\DomainTransferLetterSubmit;
 use App\Livewire\Domainregistration\SubmitRegistrationLetter;
-use App\Livewire\DomainTransfer\DomainTransferStatus;
-use App\Livewire\Mydomain\ContactUpdateStatus;
-use App\Livewire\Nameserver\EditNameserverForm;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,7 +41,9 @@ Route::get('/', function () {
    Route::get('/submitletter-domaincancel', SubmitDomainCancelLetter::class)->name('submitletter_domaincancel');
 
    Route::get('/subdomain-registration', SubdomainRegistration::class)->name('subdomain_registration');
-   Route::get('/multiple-subdomain-registration/{id}', MultipleSubdomainRegister::class)->name('multiplesubdomain_register');
+   // Route::get('/multiple-subdomain-registration/{id}', MultipleSubdomainRegister::class)->name('multiplesubdomain_register');
+
+   Route::get('/multiplesubdomain-registration', MultipleSubdomainRegistration::class)->name('bulksubdomain_register');
 
     Route::get('/subdomain-management',ManageSubdomain::class)->name('manage_subdomain');
     Route::get('/subdomain-lists',ManageSubdomainLists::class)->name('subdomain-lists');

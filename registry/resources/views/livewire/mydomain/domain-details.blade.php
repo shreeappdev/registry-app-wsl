@@ -137,8 +137,6 @@
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pt-0 pb-1 text-sm"><span
                                 class="text-secondary">Name:</span> &nbsp; {{$data['corgcontactdetails']->c_name}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
-                                class="text-secondary">Organisation:</span> &nbsp; {{$data['corgcontactdetails']->organization}}</li>
-                        <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
                                 class="text-secondary">Adress:</span> &nbsp; {{$data['corgcontactdetails']->address1}} {{$data['corgcontactdetails']->address2}} {{$data['corgcontactdetails']->pincode}}{{$data['corgcontactdetails']->state}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
                                 class="text-secondary">Telephone:</span> &nbsp; {{$data['corgcontactdetails']->telephone}}</li>
@@ -165,7 +163,7 @@
                         </div>
                         @if(!empty($data['admincontactDetails']))
                         <div class="col-md-4 col-3 text-end">
-                            <a href="/editcontact/{{isset($data['admincontactdetails']->contactid) ?? $data['admincontactDetails']->contactid}}" target="_blank"><button type="button" class="btn btn-white btn-icon px-2 py-2">
+                            <a href="{{route('editcontactform',['id'=> $data['domaindetails']->adminid,'domain'=>$data['domaindetails']->domainid,'ctype'=>2])}}" target="_blank"><button type="button" class="btn btn-white btn-icon px-2 py-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                     viewBox="0 0 24 24" fill="currentColor">
                                     <path
@@ -181,8 +179,6 @@
                     <ul class="list-group">
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pt-0 pb-1 text-sm"><span
                                 class="text-secondary">Name:</span> &nbsp; {{$data['admincontactDetails']->c_name ?? "No Data"}}</li>
-                        <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
-                                class="text-secondary">Organisation:</span> &nbsp; {{$data['admincontactDetails']->organization ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
                                 class="text-secondary">Adress:</span> &nbsp; {{$data['admincontactDetails']->address1 ?? "No Data"}} {{$data['admincontactDetails']->address2 ?? ""}} {{$data['admincontactDetails']->pincode ?? "No Data"}}{{$data['admincontactDetails']->state ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
@@ -210,7 +206,7 @@
                         </div>
                         @if(!empty($data['techcontactDetails']))
                             <div class="col-md-4 col-3 text-end">
-                                <a href="/editcontact/{{isset($data['techcontactDetails']->contactid) ?? $data['techcontactDetails']->contactid}}" target="_blank"><button type="button" class="btn btn-white btn-icon px-2 py-2">
+                                <a href="{{route('editcontactform',['id'=> $data['domaindetails']->techid,'domain'=>$data['domaindetails']->domainid,'ctype'=>3])}}" target="_blank"><button type="button" class="btn btn-white btn-icon px-2 py-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                         viewBox="0 0 24 24" fill="currentColor">
                                         <path
@@ -228,8 +224,6 @@
                     <ul class="list-group">
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pt-0 pb-1 text-sm"><span
                                 class="text-secondary">Name:</span> &nbsp; {{$data['techcontactDetails']->c_name ?? "No Data"}}</li>
-                        <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
-                                class="text-secondary">Organisation:</span> &nbsp; {{$data['techcontactDetails']->organization ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
                                 class="text-secondary">Adress:</span> &nbsp; {{$data['techcontactDetails']->address1 ?? "No Data"}} {{$data['techcontactDetails']->address2 ?? ""}} {{$data['techcontactDetails']->pincode ?? "No Data"}}{{$data['techcontactDetails']->state_utcode ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span

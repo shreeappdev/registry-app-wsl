@@ -465,7 +465,7 @@
                             <label for="adminstdcode" class="form-label">Telephone</label>
 
                                 <div class="col-md-2">
-                                    <label for="orgcountrydialcode" class="visually-hidden">Country Code</label>
+                                    <label for="adminstdcode" class="visually-hidden">Country Code</label>
                                     <input type="text" id="adminstdcode" class="form-control @error('admincountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}"  wire:model="admincountrydialcode" aria-describedby="admincountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
 
                                     <div class="invalid-feedback">

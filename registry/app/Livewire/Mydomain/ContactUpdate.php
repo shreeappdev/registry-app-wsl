@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Mydomain;
 
+use App\Models\Domain;
 use App\Models\Contact;
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -14,7 +15,7 @@ class ContactUpdate extends Component
     public $name;
     public $designation;
     public $address1;
-    public $address2;
+    public $countryid;
     public $city;
     public $state;
     public $pincode;
@@ -26,6 +27,8 @@ class ContactUpdate extends Component
     public $domain;
     public $contactid;
     public $ctype;
+    public $selectedMinistry;
+    public $countrydialcode;
 
     #[Title('My Domain')]
     public function mount($id,$domain,$ctype)
@@ -33,6 +36,11 @@ class ContactUpdate extends Component
       
         $this->contactid = $id;
         $this->ctype = $ctype;
+        $domaindetails = Domain::where('domainid', $domain)->first();
+        if (empty($domaindetails)) {
+            session()->flash('error', 'Domain not found');
+            return redirect(route('domain_status'));
+        }
 
         $existingContact = DB::table('mod_contacts')->where('contactid',"=",$id)->first();
 
@@ -43,14 +51,16 @@ class ContactUpdate extends Component
         }
     
 
-        $this->name = explode(",",$this->item->c_name)[0];
-        $this->designation = explode(",",$this->item->c_name)[1];
+        $this->name = $this->item->c_name;
+        $this->designation = $this->item->designation;
         $this->mobileno = $this->item->mobileno;
         $this->emailid = $this->item->email;
         $this->pincode = $this->item->pincode;
         $this->address1 = $this->item->address1;
-        $this->address2 = $this->item->address2;
+        $this->selectedMinistry = $domaindetails->ministry;
         $this->telephoneno = $this->item->telephone;
+        $this->stdcode = $this->item->telephone_std_code;
+        $this->countrydialcode = $this->item->country_dial_code;
         $this->city = $this->item->city;
         $this->domain=$domain;
         
@@ -66,44 +76,53 @@ class ContactUpdate extends Component
             'city'=>['required','regex:/^[a-zA-Z\s]+$/'],
             'state'=>'required',
             'pincode'=>'required |min:6 |numeric',
-            'telephoneno'=>'required| numeric',
-            'stdcode'=>'required| numeric',
+            'telephoneno'=>'required|regex:/^[0-9]{4,8}+$/',
+            'stdcode'=>'required|regex:/^[0-9]{2,4}+$/',
             'address1'=>'required'
         
         ],
         [
             'name.required' => 'Name is required',
             'designation.required' => 'Designation is required',
+            'designation.regex'=>'Only character and space is allowed',
             'city.required' => 'City is required',
             'state.required' => 'State is required',
             'pincode.required' => 'Pincode is required',
+            'pincode.min'=>'Pincode should be 6 digits',
+            'pincode.numeric'=>'Pincode should be numeric',
             'telephoneno.required' => 'Telephone No is required',
+            'telephoneno.regex'=>'Telephone No should be 4 to 8 digits',
             'mobileno.required' =>'Mobile No is required',
-            'emailid.required' =>'Email id is required',
+            'mobileno.regex'=>'Mobile No should be 10 digits',
             'address1.required' =>'Address is required',
-            'designation.regex'=>'Only character and space is allowed',
+            'emailid.required' =>'Email id is required',
             'emailid.regex'=>'Email id will be @nic.in or @gov.in',
             'stdcode.required'=>'Please enter STD code',
-
-        
+            'stdcode.regex'=>'STD code should be 2 to 4 digits',
         ]);
 
     }
+
     public function update(){
 
         $this->validateData();
+        try{
         $existingmodContact = DB::table('mod_contacts')->where('contactid',"=",$this->contactid)->get();
         $ifExists = $existingmodContact->count();
           $datatoChange= [
-            'c_name' => $this->name.",".$this->designation,
+            'c_name' => $this->name,
+            'designation' => $this->designation,
             'city' => $this->city,
             'contactid' => $this->contactid,
             'mobileno'=>$this->mobileno,
             'email'=>$this->emailid,
             'pincode'=>$this->pincode,
             'address1'=>$this->address1,
-            'address2'=>$this->address2,
-            'telephone'=>$this->stdcode."-".$this->telephoneno,
+            'state'=>$this->state,
+            'countryid'=>$this->countryid,  
+            'telephone_std_code'=>$this->stdcode, 
+            'country_dial_code'=>$this->countrydialcode, 
+            'telephone'=>$this->telephoneno,
             'city'=> $this->city,
             'domainid'=>$this->domain,
             'contact_type'=> $this->ctype,
@@ -114,19 +133,25 @@ class ContactUpdate extends Component
             DB::table('mod_contacts')
             ->where('contactid', $this->contactid)
             ->update($datatoChange);
-            session()->flash('message', 'Contact update request submitted. It will be approved and reflected soon');
-            return redirect(route('single-domain',['domainid'=>$this->domain]));
+            // session()->flash('message', 'Contact update request submitted. It will be approved and reflected soon');
+            // return redirect(route('single-domain',['domainid'=>$this->domain]));
+
+            
+            $this->dispatch('contactrequestsubmitted',icon:'success',title:'Request Submitted',html:"<p>Contact update request submitted. It will be approved and reflected soon.</p></div>");
+
         }else{
            DB::table('mod_contacts')
             ->insert($datatoChange);
         
-            session()->flash('message', 'Contact update request submitted ');
-            return redirect(route('my_domains'));
-        }
+            // session()->flash('message', 'Contact update request submitted ');
+            // return redirect(route('my_domains'));
 
-        session()->flash('error', 'Data is not updated');
-        return redirect(route('single-domain',['domainid' => $this->domain]));
+               $this->dispatch('contactrequestsubmitted',icon:'success',title:'Request Submitted',html:"<p>Contact update request submitted. It will be approved and reflected soon.</p></div>");
+        }
+    }catch(\Exception $e){
+         $this->dispatch('contactrequestFailed',icon:'falied',title:'Request Not submitted for some technical issue',html:"<p>Contact Support.</p></div>");
     }
+   }
 
 
     public function render()

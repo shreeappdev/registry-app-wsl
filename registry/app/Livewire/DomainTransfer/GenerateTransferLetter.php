@@ -5,7 +5,7 @@ namespace App\Livewire\DomainTransfer;
 use App\Models\Contact;
 use Livewire\Component;
 use Livewire\Attributes\Title;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\Customdbresults;
 use Illuminate\Support\Facades\Storage;
 
@@ -43,10 +43,11 @@ class GenerateTransferLetter extends Component
         },$this->domainname_transfer);
     
 
-        $loginContactDetails = Contact::where('contactid', '=','yu756sy8309')->first() ? : [];
+        $loginContactDetails = Contact::where('contactid', '=','yu756sy8309')->first() ? : null;
         
         if (empty($loginContactDetails)) {
             session()->flash('failed','There is some error with Login Account details');
+            return;
         }
 
         $submitteddomains=rtrim(",",implode(",",$this->domainname_transfer));
@@ -55,12 +56,12 @@ class GenerateTransferLetter extends Component
             'title' => 'Domain Transfer Letter',
             'date' => date('m/d/Y'),
             'domain' => $submitteddomains,
-            'organisationPersonName' => $loginContactDetails->c_name,
-            'email' => $loginContactDetails->email
+            'organisationPersonName' => $loginContactDetails->c_name ?? 'N/A',
+            'email' => $loginContactDetails->email ??   'N/A',
           
         ];
 
-        $pdf = PDF::loadView('livewire.Letterformat.domaintransfer', $data);
+        $pdf = pdf::loadView('livewire.Letterformat.domaintransfer', $data);
 
             $filename = 'domain_transferletter'.date('dd-mm-yy-H-i-s').'.pdf';
             // Save the PDF in the public storage folder
