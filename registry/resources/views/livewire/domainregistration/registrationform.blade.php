@@ -142,6 +142,7 @@
                                         <option value={{ $state->state_utcode }}>{{ $state->state_utname }}</option>
                                     @endforeach
                                 </select>
+                                
 
                                 <div class="invalid-feedback">
                                     @error('state_domain')
