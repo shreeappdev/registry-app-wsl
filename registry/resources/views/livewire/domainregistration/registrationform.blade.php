@@ -6,6 +6,7 @@
     <form class="row needs-validation" method= "post" wire:submit.prevent="register" novalidate>
         @csrf
         @if ($currentStep == 1)
+        {{--@php $is_ministry_org = false; @endphp --}}
             <div class="step-one">
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
@@ -18,7 +19,7 @@
                             <label for="language" class="form-label">Select language</label>
                             <select id="language" class="form-control custom-select @error('language_code') is-invalid @enderror"
                                 wire:model.live="language_code">
-                                <option>Choose...</option>
+                                <option value="">Choose...</option>
                                 @foreach ($languages as $key => $language)
                                     <option value="{{ $language->lang_code }}"
                                         {{ $language->lang_code == 'en' ? 'selected' : '' }}>{{ $language->lang_name }}
@@ -36,8 +37,21 @@
                             <div class="col-md-9">
                                 <label for="domainname" class="form-label">Domain Name</label>
                                 <div class="input-group">
-                                    <input type="text" id="domainname" class="form-control  @error('domainname') is-invalid @enderror"
-                                        placeholder="Enter Domain Name" wire:model="domainname" required>
+                                    {{-- <input type="text" id="domainname" class="form-control  @error('domainname') is-invalid @enderror"
+                                        placeholder="Enter Domain Name" wire:model="domainname" required> --}}
+
+                                    <input 
+                                    type="text" 
+                                    id="domainname" 
+                                    class="form-control @error('domainname') is-invalid @enderror" 
+                                    placeholder="Enter Domain Name" 
+                                    wire:model="domainname" 
+                                    lang="{{$language_code }}" 
+                                    dir="ltr" 
+                                    required>
+
+
+
                                     <span class="input-group-text">{{ $language_extension->extension ?? '.gov.in' }}</span>
                                     <div class="invalid-feedback">
                                         @error('domainname')
@@ -73,9 +87,9 @@
                             <div class="col-md-3">
                                 <label for="region" class="form-label">Select Region</label>
                                 <select id="region" class="form-control @error('region') is-invalid @enderror" wire:model.live="region">
-                                    <option selected>...Select...</option>
-                                    <option value=1>Central</option>
-                                    <option value=2>State</option>
+                                    <option value="" selected>...Select...</option>
+                                    <option value="1">Central</option>
+                                    <option value="2">State</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     @error('region')
@@ -83,17 +97,27 @@
                                     @enderror
                                 </div>
                             </div>
-                         
+                            @if(!empty($orgCategories) && count($orgCategories) > 0)
                             <div class="col-md-9">
                                 <label for="orgCategory" class="form-label">Select Organization Category</label>
                                 <select id="orgCategory" class="form-control @error('selectedOrgcategory') is-invalid @enderror"
                                     wire:model.live="selectedOrgcategory">
-                                    <option selected>Choose...</option>
+                                    <option value="" selected>Choose...</option>
                                     @foreach ($orgCategories as $key => $orgcategory)
-                                        <option value={{ $orgcategory->orgcatid }}
-                                            data-deptVisible={{ $orgcategory->dept_is_visible }}
-                                            data-addOrganisation={{ $orgcategory->add_organisation }}
-                                            data-showministry={{ $orgcategory->ministry_show_in_dropdown }}>
+
+                                       {{-- 
+                                       @if( $orgcategory->orgcatid == "6")
+
+                                           @php $is_ministry_org = true;   @endphp
+                                        @else
+                                           @php $is_ministry_org = false; @endphp
+                                        @endif
+                                       --}} 
+
+                                        <option value="{{ $orgcategory->orgcatid }}"
+                                            data-deptVisible="{{ $orgcategory->dept_is_visible }}"
+                                            data-addOrganisation="{{ $orgcategory->add_organisation }}"
+                                            data-showministry="{{ $orgcategory->ministry_show_in_dropdown }}">
                                             {{ $orgcategory->orgcat }}</option>
                                     @endforeach
 
@@ -104,42 +128,47 @@
                                     @enderror
                                 </div>
                             </div>
+                            @endif
 
                         </div>
 
-                        @if ($region == 1)
-                         <div class="form-group">
+                        @if ($region == 1 && !empty($ministries) && count($ministries) > 0)
+                        <div class="form-group">
                             <div class="col-md-6">
                                 <label for="ministry" class="form-label">Select Ministry</label>
                                 <select id="ministry" class="form-control @error('selectedMinistry') is-invalid @enderror"
                                     wire:model.live="selectedMinistry">
                                     @if (count($ministries) < 1)
-                                        <option selected>No data</option>
+                                        <option value="" selected>No data</option>
                                     @else
                                         <option>Choose...</option>
                                         @foreach ($ministries as $key => $min)
-                                            <option value={{ $min->m_id }}>{{ $min->m_name }}</option>
+                                            <option value="{{ $min->m_id }}">{{ $min->m_name }}</option>
                                         @endforeach
                                     @endif
                                 </select>
-
+                                @if ($customMsg) 
+                                    <div class="invalid-feedback d-block">
+                                        {{ $customMsg }}
+                                    </div>
+                                @endif
                                 <div class="invalid-feedback">
                                     @error('selectedMinistry')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
-                          </div>
+                        </div>
                         @endif
-                        @if ($region == 2)
+                        @if ($region == 2 && !empty($states))
                           <div class="form-group">
                             <div class="col-md-6">
                                 <label for="domainstate" class="form-label">State</label>
                                 <select id="domainstate" class="form-control @error('state_domain') is-invalid @enderror"
                                     wire:model="state_domain">
-                                    <option selected>Choose...</option>
+                                    <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
-                                        <option value={{ $state->state_utcode }}>{{ $state->state_utname }}</option>
+                                        <option value="{{ $state->state_utcode }}">{{ $state->state_utname }}</option>
                                     @endforeach
                                 </select>
 
@@ -152,7 +181,7 @@
                           </div>
                         @endif
 
-                        @if($isdepartmentVisible)
+                        @if($isdepartmentVisible && !empty($departments) && count($departments) > 0 && $region == 1 /*&& !$is_ministry_org */)
                           <div class="form-group">
                             <div class="col-md-6">
                                 <label for="department" class="form-label">Select Department</label>
@@ -175,8 +204,10 @@
                             </div>
                           </div>
                         @endif
-
+                        
+                        
                        <div class="form-group row g-3">
+                            @if(!empty($organisations) && count($organisations) > 0 /* && !$is_ministry_org */)
                             <div class="col-md-6">
                                 <label for="organisation" class="form-label">Select Organisation</label>
                                 <select  class="form-control @error('selectedOrganisation') is-invalid @enderror"
@@ -185,9 +216,9 @@
                                     @if(count($organisations) < 1)
                                         <option value="0" selected>No data</option>
                                     @else
-                                        <option>Choose..</option>
+                                        <option value="">Choose..</option>
                                         @foreach ($organisations as $key => $organisation)
-                                            <option value={{ $organisation->org_id }}>{{ $organisation->org_name }}</option>
+                                            <option value="{{ $organisation->org_id }}">{{ $organisation->org_name }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -197,20 +228,21 @@
                                     @enderror
                                 </div>
                             </div>
+                            @endif
 
-                        @if ($isaddOrganisation)
+                            @if ($isaddOrganisation)
 
-                         <div class="col-md-6">
-                            <label for="addnewOrganisation" class="form-label">Add Organisation</label>
-                            <input type="text"  class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model="addnewOrganisation">
-                                @error('addnewOrganisation')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                           </div>
-                        @endif
-                     </div>
+                            <div class="col-md-6">
+                                <label for="addnewOrganisation" class="form-label">Add Organisation</label>
+                                <input type="text"  class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model="addnewOrganisation">
+                                    @error('addnewOrganisation')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -276,7 +308,7 @@
                                 <label for="orginputState" class="form-label">State</label>
                                 <select class="form-control @error('orgState') is-invalid @enderror"
                                     wire:model.live="orgState">
-                                    <option selected>Choose...</option>
+                                    <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
                                     @endforeach
@@ -434,8 +466,7 @@
                                 <label for="admininputState" class="form-label">State</label>
                                 <select class="form-control @error('adminCity') is-invalid @enderror"
                                     wire:model="adminState">
-                                    <option selected>Choose...</option>
-                                    <option selected>Choose...</option>
+                                    <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
                                     @endforeach
@@ -593,7 +624,7 @@
                                 <label for="techinputState" class="form-label">State</label>
                                 <select class="form-control @error('techState') is-invalid @enderror"
                                     wire:model="techState">
-                                    <option selected>Choose...</option>
+                                    <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
                                     @endforeach

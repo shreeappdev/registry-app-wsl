@@ -32,7 +32,8 @@ class Registrationform extends Component
     public $state_domain;
     public $region;
     public $isaddOrganisation=false;
-
+    public $customMsg = '';
+    public $states=[];
 
     /**Multi dropdown */
 
@@ -45,6 +46,7 @@ class Registrationform extends Component
     public $selectedDepartment=null;
     public $selectedOrganisation=null;  
     public $addnewOrganisation = '';
+   
     
     /** Second step */
    
@@ -177,7 +179,7 @@ class Registrationform extends Component
                         ]);
                     }
                 }
-            }
+        }
         if( $this->currentStep == 2){
 
             $this->validate([
@@ -476,23 +478,28 @@ class Registrationform extends Component
                         'activation_status' => 'Pending',
                     ]);
 
-
                     DB::commit();
 
-                    $this->dispatch('formSubmitted',icon:'success',title:'Domain Registered successfully',text:$domainname,html:"<table class='table table-bordered'><tbody>
-                    <tr style='text-align:left' ><td>Domain Name</td><td><strong>{$domainname}</strong></td></tr>
-                    <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
-                    </tbody>
-                    </table> 
-                    <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
-                   <ul style='text-align:left'>
-                        <li> Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</a> </li>
-                        <li> Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
-                        <li> Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
-                        <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
-                        <li> You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
-                    </ul>
-                    <p>Thank you for requesting domain name under GOV.IN.</p></div>");
+                    $this->dispatch('formSubmitted', [
+                        'icon' => 'success',
+                        'title' => 'Domain Registered successfully',
+                        'text' => $domainname,
+                        'html' => "<table class='table table-bordered'><tbody>
+                            <tr style='text-align:left'><td>Domain Name</td><td><strong>{$domainname}</strong></td></tr>
+                            <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
+                            </tbody>
+                            </table>
+                            <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
+                            <ul style='text-align:left'>
+                                <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
+                                <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
+                                <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
+                                <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
+                                <li>You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
+                            </ul>
+                            <p>Thank you for requesting domain name under GOV.IN.</p>"
+                    ]);
+
 
                 
 
@@ -505,7 +512,14 @@ class Registrationform extends Component
                DB::rollBack();
                Log::error('Transaction failed: ' . $e->getMessage());
                
-               $this->dispatch('formSubmitted',icon:'error',type:'danger',title:'Domain Registration failed',text:$e,date:date('Y-m-d'),html:"<p>{$e->getMessage()}There is some issue with registration .Please write to us at support@registry.gov.in</p>");
+                $this->dispatch('formSubmitted', [
+                    'icon' => 'error',
+                    'type' => 'danger',
+                    'title' => 'Domain Registration failed',
+                    'text' => $e->getMessage(),
+                    'date' => date('Y-m-d'),
+                    'html' => "<p>{$e->getMessage()} There is some issue with registration. Please write to us at support@registry.gov.in</p>"
+                ]);
             }
            
     
@@ -515,8 +529,13 @@ class Registrationform extends Component
 
         public function updatedregion($region)
         {
-            $this->orgCategories = Orgcategory::where('region','=',$region)->get();
+            $this->orgCategories = Orgcategory::where('region','=',$region)->where('is_active',1)->get();
             $this->selectedOrgcategory = null;
+            $this->selectedMinistry = null;
+            $this->selectedDepartment = null;
+            $this->selectedOrganisation = null;
+            $this->state_domain= null;
+           // dd($this->orgCategories);
            
         }
     
@@ -525,17 +544,16 @@ class Registrationform extends Component
 
     
             $getorgcatRow= Orgcategory::where('orgcatid',$orgCategory)->first(); 
-             $orgcat = ($getorgcatRow && $getorgcatRow->ministry_is_visible < 1)
-            ? $orgCategory
-            : 0;       
+            $orgcat = ($getorgcatRow && $getorgcatRow->ministry_is_visible < 1)? $orgCategory : 0;       
             $this->ministries = Ministry::where('orgcatid','=',$orgcat)->get();
-            $this->isaddOrganisation = $getorgcatRow->add_organisation == 1 ? true : false;
-            $this->isdepartmentVisible = $getorgcatRow->dept_is_visible == 1 ? true : false; 
+            $this->isaddOrganisation = !empty($getorgcatRow) && $getorgcatRow->add_organisation == 1 ? true : false;
+            $this->isdepartmentVisible = !empty($getorgcatRow) && $getorgcatRow->dept_is_visible == 1 ? true : false; 
             $this->selectedMinistry = null;
             $this->selectedDepartment = null;
             $this->selectedOrganisation = null;
             $this->departments = [];
             $this->organisations = [];
+            $this->states = StateUt::all();
           
     
         }
@@ -543,48 +561,70 @@ class Registrationform extends Component
        
         public function updatedSelectedMinistry($ministry)
         {
+           if($this->selectedOrgcategory == '6'){
+                $org = Organisation::where('m_id', '=', $this->selectedMinistry)
+                ->where('orgcat_id', '=', $this->selectedOrgcategory)->select('org_id')->first();
+                
+                $this->selectedDepartment = 0;
+                //$this->selectedOrganisation = !empty($org) && isset($org->org_id)? $org->org_id : 0 ;
+                $this->selectedOrganisation = 0;
+  
+           }elseif($this->selectedOrgcategory == '4'){
 
-            $this->departments = Department::where('m_id','=',$ministry)->get();
+                $this->departments = Department::where('m_id','=',$ministry)->get();
+                $this->customMsg = (!empty( $this->departments) && count($this->departments) > 0)
+                                    ? ""
+                                    :'No department for this ministry please select another ministry.' ;
+                //dd($this->customMsg);
 
-            if(!$this->isdepartmentVisible){
-                $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
-                ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
-            }else{
-               $this->organisations = [];
-               $this->selectedOrganisation = null;
+           }
+           else{
+                $this->departments = Department::where('m_id','=',$ministry)->get();
+
+                if(!$this->isdepartmentVisible){
+                    $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
+                    ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
+                }else{
+                $this->organisations = [];
+                $this->selectedOrganisation = null;
+                }
             }
-          
+          //dd($this->organisations);
             $this->selectedDepartment = null;           
            
         }
 
         public function updatedselectedDepartment($department)
         {
+            if($this->selectedOrgcategory == '4'){
+               $this->selectedOrganisation = 0; 
+            }else{
+                $query = Organisation::query();
 
-           $query = Organisation::query();
+                if ($department > 0 || $department != null) {
+                    $query->where('dept_id', '=', $department);
+                }
 
-            if ($department > 0 || $department != null) {
-                $query->where('dept_id', '=', $department);
+                $query->where('m_id', '=', $this->selectedMinistry)
+                    ->where('orgcat_id', '=', $this->selectedOrgcategory);
+
+                $this->organisations = $query->get();
             }
-
-            $query->where('m_id', '=', $this->selectedMinistry)
-                ->where('orgcat_id', '=', $this->selectedOrgcategory);
-
-            $this->organisations = $query->get();
+            
                     
         }
         
    
     public function render(){
         
-        $languages = IdnLanguage::all();
-        $states = StateUt::all();
+        $languages = IdnLanguage::where('is_active',1)->get();
+        //$states = StateUt::all();
         $langentension = IdnLanguage::where('lang_code',$this->language_code)->first();
       
 
         return view('livewire.domainregistration.registrationform',[
             'languages'=>$languages,
-            'states'=>$states,
+            //'states'=>$states,
             'language_extension'=>$langentension,
         ]);
     }
