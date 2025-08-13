@@ -37,20 +37,8 @@
                             <div class="col-md-9">
                                 <label for="domainname" class="form-label">Domain Name</label>
                                 <div class="input-group">
-                                    {{-- <input type="text" id="domainname" class="form-control  @error('domainname') is-invalid @enderror"
-                                        placeholder="Enter Domain Name" wire:model="domainname" required> --}}
-
-                                    <input 
-                                    type="text" 
-                                    id="domainname" 
-                                    class="form-control @error('domainname') is-invalid @enderror" 
-                                    placeholder="Enter Domain Name" 
-                                    wire:model="domainname" 
-                                    lang="{{$language_code }}" 
-                                    dir="ltr" 
-                                    required>
-
-
+                                    <input type="text" id="domainname" class="form-control  @error('domainname') is-invalid @enderror"
+                                        placeholder="Enter Domain Name" wire:model.live="domainname" required>
 
                                     <span class="input-group-text">{{ $language_extension->extension ?? '.gov.in' }}</span>
                                     <div class="invalid-feedback">
@@ -160,12 +148,11 @@
                             </div>
                         </div>
                         @endif
-                       
-                        @if ($region == 2 && !empty($states))
+                        @if ($region == 2 && !empty($states) && !empty($selectedOrgcategory))
                           <div class="form-group">
                             <div class="col-md-6">
                                 <label for="domainstate" class="form-label">State</label>
-                                <select id="domainstate" class="form-control @error('state_domain') is-invalid @enderror"
+                                <select id="domainstate" class="form-control @error('selectedState') is-invalid @enderror"
                                     wire:model.live="selectedState">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
@@ -173,8 +160,14 @@
                                     @endforeach
                                 </select>
 
+                                @if ($customMsg) 
+                                    <div class="invalid-feedback d-block">
+                                        {{ $customMsg }}
+                                    </div>
+                                @endif
+
                                 <div class="invalid-feedback">
-                                    @error('state_domain')
+                                    @error('selectedState')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -212,7 +205,7 @@
                             <div class="col-md-6">
                                 <label for="organisation" class="form-label">Select Organisation</label>
                                 <select  class="form-control @error('selectedOrganisation') is-invalid @enderror"
-                                    wire:model="selectedOrganisation">
+                                    wire:model.live="selectedOrganisation">
                                    
                                     @if(count($organisations) < 1)
                                         <option value="0" selected>No data</option>
@@ -800,11 +793,11 @@
         <div class="col-12 mt-4">
 
 
-            @if ($currentStep >= 1 && $currentStep < 5)
-                <button type="button" class="btn btn-dark " wire:click="increaseStep()">Next</button>
-            @endif
             @if ($currentStep > 1 && $currentStep <= 5)
                 <button type="button" class="btn btn-dark" wire:click="decreaseStep()">Back</button>
+            @endif
+            @if ($currentStep >= 1 && $currentStep < 5)
+                <button type="button" class="btn btn-dark " wire:click="increaseStep()">Next</button>
             @endif
             @if ($currentStep == 5)
                 <button type="submit" class="btn btn-dark">Submit</button>
