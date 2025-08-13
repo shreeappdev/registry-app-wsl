@@ -144,7 +144,7 @@ class Registrationform extends Component
                     'hindidomainname'=>'required',
                     'selectedOrgcategory'=>'required',
                     'selectedMinistry'=>'required_if:region,1',
-                    'state_domain'=>'required_if:region,2',
+                   // 'state_domain'=>'required_if:region,2',
                     'selectedDepartment'=>[new SelectedDepartmentRequired($this->selectedOrgcategory)],       
                  ],
                 [
@@ -155,11 +155,11 @@ class Registrationform extends Component
                     'hindidomainname.required' => 'Hindi Domain name is required',
                     'hindidomainname.regex' => 'Hindi Domain name should be in format',
                     'selectedMinistry.required_if'=>'Please select ministry in case of selected region is Central',
-                    'state_domain.required_if'=>'Please select state in case of selected region is State/UT',
+                   // 'state_domain.required_if'=>'Please select state in case of selected region is State/UT',
                     'selectedOrgcategory.required' => 'Organisation Category is required',
                     'language.required' => 'Please choose language of domain',
                     'selectedMinistry.required_if'=>'Please select ministry',
-                    'state_domain.required_if'=>'Please select state',
+                    //'state_domain.required_if'=>'Please select state',
                 ]);
 
                 if (empty($this->selectedOrganisation) && empty($this->addnewOrganisation)) {
@@ -534,7 +534,7 @@ class Registrationform extends Component
             $this->selectedMinistry = null;
             $this->selectedDepartment = null;
             $this->selectedOrganisation = null;
-            $this->state_domain= null;
+           // $this->state_domain= null;
            // dd($this->orgCategories);
            
         }
@@ -553,7 +553,7 @@ class Registrationform extends Component
             $this->selectedOrganisation = null;
             $this->departments = [];
             $this->organisations = [];
-            $this->states = StateUt::all();
+           // $this->states = StateUt::all();
           
     
         }
@@ -618,13 +618,12 @@ class Registrationform extends Component
     public function render(){
         
         $languages = IdnLanguage::where('is_active',1)->get();
-        //$states = StateUt::all();
+        $states = StateUt::all();
         $langentension = IdnLanguage::where('lang_code',$this->language_code)->first();
       
-
         return view('livewire.domainregistration.registrationform',[
             'languages'=>$languages,
-            //'states'=>$states,
+            'states'=>$states,
             'language_extension'=>$langentension,
         ]);
     }

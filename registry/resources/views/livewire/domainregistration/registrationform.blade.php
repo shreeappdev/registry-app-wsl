@@ -160,12 +160,13 @@
                             </div>
                         </div>
                         @endif
+                       
                         @if ($region == 2 && !empty($states))
                           <div class="form-group">
                             <div class="col-md-6">
                                 <label for="domainstate" class="form-label">State</label>
                                 <select id="domainstate" class="form-control @error('state_domain') is-invalid @enderror"
-                                    wire:model="state_domain">
+                                    wire:model.live="selectedState">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option value="{{ $state->state_utcode }}">{{ $state->state_utname }}</option>
