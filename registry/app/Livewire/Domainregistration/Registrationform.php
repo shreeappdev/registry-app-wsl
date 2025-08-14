@@ -110,12 +110,12 @@ class Registrationform extends Component
 
             $this->currentStep = 1;
             $this->multipleip = ['nshostname' => '', 'ip' => []];
-          //  $this->isaddOrganisation = false;
+            $this->isaddOrganisation = false;
             $this->isdepartmentVisible = false;
         }
 
         public function increaseStep(){
-
+// dd('org',$this->selectedOrganisation,'min',$this->selectedMinistry,'dept',$this->selectedDepartment);
             $this->resetErrorBag();
             $this->validateData();
             $this->currentStep++;
@@ -144,21 +144,25 @@ class Registrationform extends Component
                 'selectedOrganisation' => 'required',
                 'selectedState' => 'required_if:region,2',
                 'selectedMinistry' => 'required_if:region,1',
-                'selectedDepartment' => [new SelectedDepartmentRequired($this->selectedOrgcategory)],
+                // 'selectedDepartment' => [new SelectedDepartmentRequired($this->selectedOrgcategory)],
+                'selectedDepartment' => 'required_if:selectedOrgcategory,4,10',
+               
+
             ];
         }
 
         private function messagesForStep1()
         {
             return [
-                'region.required' => 'Please select region',
-                'language_code.required' => 'Please select language',
-                'domainname.required' => 'Domain name is required',
-                'hindidomainname.required_if' => 'Hindi Domain name is required',
-                'selectedMinistry.required_if' => 'Please select ministry when region is Central',
-                'selectedOrgcategory.required' => 'Organisation Category is required',
-                'selectedOrganisation.required' => 'Organisation is required',
-                'selectedState.required_if' => 'State is required'
+                'region.required' => 'Please select region.',
+                'language_code.required' => 'Please select language.',
+                'domainname.required' => 'Domain name is required.',
+                'hindidomainname.required_if' => 'Hindi Domain name is required.',
+                'selectedMinistry.required_if' => 'Please select ministry when region is Central.',
+                'selectedOrgcategory.required' => 'Organisation Category is required.',
+                'selectedOrganisation.required' => 'Organisation is required.',
+                'selectedState.required_if' => 'State is required.',
+                'selectedDepartment.required_if' => 'Department is required.'
             ];
         }  
     
@@ -587,6 +591,9 @@ class Registrationform extends Component
             $this->customMsg = (!empty( $this->organisations) && count($this->organisations) > 0)
                         ? ""
                         :'No Organisation for this State please select another State.' ;
+            if(!empty($this->customMsg)){
+                $this->selectedOrganisation = null;
+            }
                
 
         }
@@ -613,45 +620,45 @@ class Registrationform extends Component
        
         public function updatedSelectedMinistry($ministry)
         {
-            // $this->resetErrorBag('selectedMinistry');
-           if($this->selectedOrgcategory == '6'){
-                $org = Organisation::where('m_id', '=', $this->selectedMinistry)
-                ->where('orgcat_id', '=', $this->selectedOrgcategory)->select('org_id')->first();
-                
+           if($this->selectedOrgcategory == '6'){ // For orgcategory MUI, show only ministry
                 $this->selectedDepartment = 0;
-                //$this->selectedOrganisation = !empty($org) && isset($org->org_id)? $org->org_id : 0 ;
-                $this->selectedOrganisation = 0;
-  
-           }elseif($this->selectedOrgcategory == '4'){
-
+                $this->selectedOrganisation = 0;  
+           }elseif($this->selectedOrgcategory == '4'){ // For orgcategory DUI , show only ministry and dept
                 $this->departments = Department::where('m_id','=',$ministry)->get();
                 $this->customMsg = (!empty( $this->departments) && count($this->departments) > 0)
                                     ? ""
                                     :'No department for this ministry please select another ministry.' ;
-                //dd($this->customMsg);
+           }else{
 
-           }
-           else{
-                $this->departments = Department::where('m_id','=',$ministry)->get();
+                if(in_array($this->selectedOrgcategory,[1,2,3,5,7])){
+                    $this->selectedDepartment = 0;
+                    $this->departments = [];
+                }
+         
+                if($this->selectedOrgcategory == 10){
+                    $this->departments = Department::where('m_id','=',$ministry)->get();
+                }
 
                 if(!$this->isdepartmentVisible){
                     $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
                     ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
-                }else{
-                $this->organisations = [];
-                $this->selectedOrganisation = null;
+                } else{
+                    $this->organisations = [];
+                    $this->selectedOrganisation = null;
                 }
-            }
+         
           //dd($this->organisations);
-            $this->selectedDepartment = null;           
-           
+          //  $this->selectedDepartment = null;           
+         
+           }  
         }
 
         public function updatedselectedDepartment($department)
         {
-            // $this->resetErrorBag('selectedDepartment');
+            $this->resetErrorBag('selectedDepartment');
             if($this->selectedOrgcategory == '4'){
                $this->selectedOrganisation = 0; 
+               $this->organisations = [];
             }else{
                 $query = Organisation::query();
 
@@ -670,6 +677,7 @@ class Registrationform extends Component
 
         public function updated($propertyName)
         {
+            $this->customMsg = '';
             $this->resetErrorBag($propertyName);
         }
 
