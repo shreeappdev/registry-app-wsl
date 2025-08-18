@@ -146,7 +146,15 @@ class Registrationform extends Component
                 'selectedMinistry' => 'required_if:region,1',
                 // 'selectedDepartment' => [new SelectedDepartmentRequired($this->selectedOrgcategory)],
                 'selectedDepartment' => 'required_if:selectedOrgcategory,4,10',
-               
+                'addnewOrganisation' =>  [
+                                            function ($attribute, $value, $fail) {
+                                                if (in_array($this->selectedOrgcategory, [10, 11]) 
+                                                    && empty($this->selectedOrganisation) 
+                                                    && empty($value)) {
+                                                    $fail('The Add Organisation field is required when your organisation does not exist in organisation field.');
+                                                }
+                                            }
+                                        ],
 
             ];
         }
@@ -623,11 +631,11 @@ class Registrationform extends Component
            if($this->selectedOrgcategory == '6'){ // For orgcategory MUI, show only ministry
                 $this->selectedDepartment = 0;
                 $this->selectedOrganisation = 0;  
-           }elseif($this->selectedOrgcategory == '4'){ // For orgcategory DUI , show only ministry and dept
+           }elseif($this->selectedOrgcategory == '4' || $this->selectedOrgcategory == '10' ){ // For orgcategory DUI , show only ministry and dept
                 $this->departments = Department::where('m_id','=',$ministry)->get();
                 $this->customMsg = (!empty( $this->departments) && count($this->departments) > 0)
                                     ? ""
-                                    :'No department for this ministry please select another ministry.' ;
+                                    :'No department for this ministry please Either select another ministry Or Organization Category.' ;
            }else{
 
                 if(in_array($this->selectedOrgcategory,[1,2,3,5,7])){
@@ -635,9 +643,9 @@ class Registrationform extends Component
                     $this->departments = [];
                 }
          
-                if($this->selectedOrgcategory == 10){
-                    $this->departments = Department::where('m_id','=',$ministry)->get();
-                }
+                // if($this->selectedOrgcategory == 10){
+                //     $this->departments = Department::where('m_id','=',$ministry)->get();
+                // }
 
                 if(!$this->isdepartmentVisible){
                     $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
@@ -655,7 +663,7 @@ class Registrationform extends Component
 
         public function updatedselectedDepartment($department)
         {
-            $this->resetErrorBag('selectedDepartment');
+           // $this->resetErrorBag('selectedDepartment');
             if($this->selectedOrgcategory == '4'){
                $this->selectedOrganisation = 0; 
                $this->organisations = [];
