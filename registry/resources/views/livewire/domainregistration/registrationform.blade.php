@@ -228,7 +228,7 @@
 
                             <div class="col-md-6">
                                 <label for="addnewOrganisation" class="form-label">Add Organisation</label>
-                                <input type="text"  class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model.live="addnewOrganisation">
+                                <input type="text" class="form-control @error('addnewOrganisation') is-invalid @enderror" placeholder="Enter Organisation Name" wire:model.live="addnewOrganisation" @if(!empty($selectedOrganisation)) readonly value="" @endif>
                                     @error('addnewOrganisation')
                                         <div class="invalid-feedback">
                                             {{ $message }}

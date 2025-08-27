@@ -141,20 +141,23 @@ class Registrationform extends Component
                 'language_code' => 'required',
                 'hindidomainname'=>'required_if:language_code,en',
                 'selectedOrgcategory' => 'required',
-                'selectedOrganisation' => 'required',
+                'selectedOrganisation' => 'required_if:addnewOrganisation,""',
                 'selectedState' => 'required_if:region,2',
                 'selectedMinistry' => 'required_if:region,1',
                 // 'selectedDepartment' => [new SelectedDepartmentRequired($this->selectedOrgcategory)],
                 'selectedDepartment' => 'required_if:selectedOrgcategory,4,10',
-                'addnewOrganisation' =>  [
-                                            function ($attribute, $value, $fail) {
-                                                if (in_array($this->selectedOrgcategory, [10, 11]) 
-                                                    && empty($this->selectedOrganisation) 
-                                                    && empty($value)) {
-                                                    $fail('The Add Organisation field is required when your organisation does not exist in organisation field.');
-                                                }
-                                            }
-                                        ],
+                'addnewOrganisation' => 'nullable|regex:/^[a-zA-Z\s]+$/',
+
+                // 'addnewOrganisation' =>  [
+                //                              function ($attribute, $value, $fail) {
+                //                                 if (in_array($this->selectedOrganisation, [10, 11]) 
+                //                                     && empty($this->selectedOrganisation) 
+                //                                     && empty($value)) {
+                //                                     // $fail('The Add Organisation field is required when your organisation does not exist in organisation field.');
+                //                                      $fail(__('validation.custom.addnewOrganisation.required'));
+                //                                 }
+                //                             }
+                //                         ],
 
             ];
         }
@@ -168,9 +171,11 @@ class Registrationform extends Component
                 'hindidomainname.required_if' => 'Hindi Domain name is required.',
                 'selectedMinistry.required_if' => 'Please select ministry when region is Central.',
                 'selectedOrgcategory.required' => 'Organisation Category is required.',
-                'selectedOrganisation.required' => 'Organisation is required.',
+                'selectedOrganisation.required_if' => 'Organisation is required.',
                 'selectedState.required_if' => 'State is required.',
-                'selectedDepartment.required_if' => 'Department is required.'
+                'selectedDepartment.required_if' => 'Department is required.',
+                'addnewOrganisation.regex' => 'The organisation name may only contain letters and spaces.',
+
             ];
         }  
     
@@ -180,6 +185,11 @@ class Registrationform extends Component
             $messagesMethod = "messagesForStep{$this->currentStep}";
 
             $this->validate($this->$rulesMethod(), $this->$messagesMethod());
+
+            // Extra condiional validation
+            // if (in_array($this->selectedOrganisation, [10, 11]) && empty($this->selectedOrganisation)){
+            //  $this->validate($this->$rulesMethod(), $this->$messagesMethod());
+            // }
         }
 
         public function validateData22(){
@@ -421,6 +431,23 @@ class Registrationform extends Component
                     $techcontact = 'TECH'.date('dmy').date('his');
                     $idndomainid ='IDN'.date('dmy').date('his');
                     $currentDate=date('Y-m-d H:i:s');
+
+                     /**Add organisation if it doesn't exist */
+
+                    if(!empty($this->addnewOrganisation) && empty($this->selectedOrganisation)){
+
+                        $org = Organisation::insert([
+                            'org_name'=> $this->addnewOrganisation,
+                            'm_id'=>$this->selectedMinistry,
+                            'dept_id'=>$this->selectedDepartment,
+                            'orgcat_id'=>$this->selectedOrgcategory,
+                            'state_utcode'=>$this->region == 2 ? $this->selectedState : 'cu',
+                        ]);
+
+                        $this->selectedOrganisation = $org->org_id;
+
+                    }
+
                
                     /** Main domain table insert */
                     Domain::create([
@@ -453,19 +480,7 @@ class Registrationform extends Component
                         'lang'=>'hin-deva'
                     ]);
 
-                    /**Add organisation if exixts */
-
-                    if(!empty($this->addnewOrganisation)){
-
-                        Organisation::insert([
-                            'org_name'=> $this->addnewOrganisation,
-                            'm_id'=>$this->selectedMinistry,
-                            'dept_id'=>$this->selectedDepartment,
-                            'orgcat_id'=>$this->selectedOrgcategory,
-                            'state_utcode'=>$this->region == 2 ? $this->selectedState : 'cu',
-                        ]);
-                    }
-
+                   
 
                     //insert in Organistion contacts
                 
@@ -625,35 +640,44 @@ class Registrationform extends Component
     
         }
     
-       
+        public function updatedSelectedOrganisation($value)
+        {
+            if (!empty($value)) {
+                $this->addnewOrganisation = '';
+            }
+        }
         public function updatedSelectedMinistry($ministry)
         {
            if($this->selectedOrgcategory == '6'){ // For orgcategory MUI, show only ministry
                 $this->selectedDepartment = 0;
                 $this->selectedOrganisation = 0;  
            }elseif($this->selectedOrgcategory == '4' || $this->selectedOrgcategory == '10' ){ // For orgcategory DUI , show only ministry and dept
+               
                 $this->departments = Department::where('m_id','=',$ministry)->get();
                 $this->customMsg = (!empty( $this->departments) && count($this->departments) > 0)
                                     ? ""
                                     :'No department for this ministry please Either select another ministry Or Organization Category.' ;
+                // if($this->selectedOrgcategory == '10'){
+                //      $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
+                //      ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
+                // }
+           
            }else{
 
+                $this->departments = Department::where('m_id','=',$ministry)->get();
+              
                 if(in_array($this->selectedOrgcategory,[1,2,3,5,7])){
                     $this->selectedDepartment = 0;
                     $this->departments = [];
-                }
-         
-                // if($this->selectedOrgcategory == 10){
-                //     $this->departments = Department::where('m_id','=',$ministry)->get();
-                // }
+                } 
 
-                if(!$this->isdepartmentVisible){
-                    $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
-                    ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
-                } else{
-                    $this->organisations = [];
-                    $this->selectedOrganisation = null;
-                }
+                // if(!$this->isdepartmentVisible){
+                     $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
+                     ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
+                // } else{
+                //     $this->organisations = [];
+                //     $this->selectedOrganisation = null;
+                // }
          
           //dd($this->organisations);
           //  $this->selectedDepartment = null;           

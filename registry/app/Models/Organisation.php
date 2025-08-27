@@ -10,4 +10,12 @@ class Organisation extends Model
     use HasFactory;
     protected $primaryKey='org_id';
 
+    protected $fillable = [
+        'org_name',
+        'm_id',
+        'dept_id',
+        'orgcat_id',
+        'state_utcode',
+    ];
+
 }
