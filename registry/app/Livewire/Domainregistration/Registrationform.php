@@ -115,7 +115,7 @@ class Registrationform extends Component
         }
 
         public function increaseStep(){
-// dd('org',$this->selectedOrganisation,'min',$this->selectedMinistry,'dept',$this->selectedDepartment);
+ dd('org',$this->selectedOrganisation,'min',$this->selectedMinistry,'dept',$this->selectedDepartment);
             $this->resetErrorBag();
             $this->validateData();
             $this->currentStep++;
@@ -181,6 +181,7 @@ class Registrationform extends Component
     
         public function validateData()
         {
+            dd(343);
             $rulesMethod = "rulesForStep{$this->currentStep}";
             $messagesMethod = "messagesForStep{$this->currentStep}";
 
