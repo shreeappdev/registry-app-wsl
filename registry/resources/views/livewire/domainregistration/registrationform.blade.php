@@ -21,8 +21,8 @@
                                 wire:model.live="language_code">
                                 <option value="">Choose...</option>
                                 @foreach ($languages as $key => $language)
-                                    <option translatorcode="{{ strtolower($language->lang_name) }}"  value="{{ $language->lang_code }}"
-                                        {{ $language->lang_code == 'en' ? 'selected' : '' }}>{{ $language->lang_name }}
+                                    <option translatorcode="{{ strtolower($language->lang_name) }}"  value="{{ $language->lang_code }}">
+                                        {{ $language->lang_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -829,55 +829,34 @@
         });
 
         // keyboard st
+        $('body').on('change', '#language', function () {
+            $('#domainname').val('');
+            $('#hindidomainname').val('');
+            let language = $(this).val();
+            let translateCode = $(this).find('option:selected').attr('translatorCode');
 
-$('body').on('change', '#language', function () {
-    let language = $(this).val();
-    let translateCode = $(this).find('option:selected').attr('translatorCode');
+            if (language === 'en') {
+                console.log('iff')
+                $('.hid').removeClass('is_visible');
+                pramukhIME.disable('domainname');
 
-    if (language === 'en') {
-        console.log('iff')
-        $('.hid').removeClass('is_visible');
-        // Livewire may render this field after dropdown change
-       // Livewire.hook('message.processed', () => {
-            if ($('#hindidomainname').length) {
-                pramukhIME.addLanguage(PramukhIndic);
-                pramukhIME.setLanguage('hindi', 'pramukhindic');
-                pramukhIME.enable('hindidomainname');
-            }
-     //   });
-    } else {
-        console.log('else');
-       $('.hid').addClass('is_visible');
-
-        if ($('#domainname').length) {
-            pramukhIME.addLanguage(PramukhIndic);
-            pramukhIME.setLanguage(translateCode, 'pramukhindic');
-            pramukhIME.enable('domainname');
-        }
-    }
-});
-
-
-
-        // $('body').on('change','#language', function (e){
-                    
-        //     let language = $(this).val(); console.log('language',language)
-        //     let translateCode = $(this).find('option:selected').attr('translatorCode');
+                    if ($('#hindidomainname').length) {
+                        pramukhIME.addLanguage(PramukhIndic);
+                        pramukhIME.setLanguage('hindi', 'pramukhindic');
+                        pramukhIME.enable('hindidomainname');
+                    }
         
-        //     if(language === 'en'){
-        //         $('.hindidomainname').show();
-        //         pramukhIME.addLanguage(PramukhIndic);
-        //         pramukhIME.setLanguage('hindi','pramukhindic');
-        //        // setTimeout(() => {
-        //             pramukhIME.enable('hindidomainname');
-        //       //  }, 300);
-        //     }else{ 
-        //         $('.hindidomainname').hide();  
-        //         pramukhIME.addLanguage(PramukhIndic);
-        //         pramukhIME.setLanguage(translateCode,'pramukhindic');
-        //         pramukhIME.enable('domainname'); 
-        //     }
-        // });
+            } else {
+                console.log('else');
+            $('.hid').addClass('is_visible');
+
+                if ($('#domainname').length) {
+                    pramukhIME.addLanguage(PramukhIndic);
+                    pramukhIME.setLanguage(translateCode, 'pramukhindic');
+                    pramukhIME.enable('domainname');
+                }
+            }
+        });
         // keyboard cl
     </script>
 @endpush
