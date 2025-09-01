@@ -829,6 +829,7 @@
         });
 
         // keyboard st
+
         $('body').on('change', '#language', function () {
             $('#domainname').val('');
             $('#hindidomainname').val('');
