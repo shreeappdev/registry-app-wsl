@@ -1,5 +1,5 @@
+<style>.is_visible{display: none;}</style>
 <div>
-
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Register Domain</h1>
     </div>
@@ -21,7 +21,7 @@
                                 wire:model.live="language_code">
                                 <option value="">Choose...</option>
                                 @foreach ($languages as $key => $language)
-                                    <option value="{{ $language->lang_code }}"
+                                    <option translatorcode="{{ strtolower($language->lang_name) }}"  value="{{ $language->lang_code }}"
                                         {{ $language->lang_code == 'en' ? 'selected' : '' }}>{{ $language->lang_name }}
                                     </option>
                                 @endforeach
@@ -50,8 +50,8 @@
 
                             </div>
                         </div>
-                        @if ($language_code == 'en')
-                         <div class="form-group">
+                     {{-- @if ($language_code == 'en')     --}}
+                        <div class="form-group hid is_visible">
                             <div class="col-md-9">
                                 <label for="hindidomainname" class="form-label">Idn(Hindi) Domain Name</label>
                                 <div class="input-group">
@@ -60,7 +60,7 @@
                                         placeholder="Enter Hindi Domain Name" wire:model="hindidomainname">
                                     <span class="input-group-text">.सरकार.भारत</span>
                                     <div class="invalid-feedback">
-                                        @error('domainname')
+                                        @error('hindidomainname')
                                             {{ $message }}
                                         @enderror
                                     </div>
@@ -68,7 +68,7 @@
 
                             </div>
                         </div>
-                        @endif
+                        {{-- @endif --}}
 
                      
                         <div class="form-group row g-3">
@@ -807,7 +807,9 @@
 
     </form>
 </div>
-@script
+@push('scripts')
+<script src="{{ asset('js/pramukhime.js') }}"></script>
+<script src="{{ asset('js/pramukhindic.js') }}"></script>
     <script>
         window.addEventListener('formSubmitted', (event) => {
             let data = event.detail;
@@ -825,5 +827,57 @@
 
             }); // Show alert with the message
         });
+
+        // keyboard st
+
+$('body').on('change', '#language', function () {
+    let language = $(this).val();
+    let translateCode = $(this).find('option:selected').attr('translatorCode');
+
+    if (language === 'en') {
+        console.log('iff')
+        $('.hid').removeClass('is_visible');
+        // Livewire may render this field after dropdown change
+       // Livewire.hook('message.processed', () => {
+            if ($('#hindidomainname').length) {
+                pramukhIME.addLanguage(PramukhIndic);
+                pramukhIME.setLanguage('hindi', 'pramukhindic');
+                pramukhIME.enable('hindidomainname');
+            }
+     //   });
+    } else {
+        console.log('else');
+       $('.hid').addClass('is_visible');
+
+        if ($('#domainname').length) {
+            pramukhIME.addLanguage(PramukhIndic);
+            pramukhIME.setLanguage(translateCode, 'pramukhindic');
+            pramukhIME.enable('domainname');
+        }
+    }
+});
+
+
+
+        // $('body').on('change','#language', function (e){
+                    
+        //     let language = $(this).val(); console.log('language',language)
+        //     let translateCode = $(this).find('option:selected').attr('translatorCode');
+        
+        //     if(language === 'en'){
+        //         $('.hindidomainname').show();
+        //         pramukhIME.addLanguage(PramukhIndic);
+        //         pramukhIME.setLanguage('hindi','pramukhindic');
+        //        // setTimeout(() => {
+        //             pramukhIME.enable('hindidomainname');
+        //       //  }, 300);
+        //     }else{ 
+        //         $('.hindidomainname').hide();  
+        //         pramukhIME.addLanguage(PramukhIndic);
+        //         pramukhIME.setLanguage(translateCode,'pramukhindic');
+        //         pramukhIME.enable('domainname'); 
+        //     }
+        // });
+        // keyboard cl
     </script>
-@endscript
+@endpush
