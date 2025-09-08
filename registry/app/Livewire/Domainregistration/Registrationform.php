@@ -594,6 +594,7 @@ class Registrationform extends Component
 
         public function updatedregion($region)
         {
+            
             // $this->resetErrorBag('region');
             $this->orgCategories = Orgcategory::where('region','=',$region)->where('is_active',1)->get();
             $this->selectedOrgcategory = null;
