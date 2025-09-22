@@ -10,5 +10,5 @@ class Nameserver_data extends Model
       use HasFactory;
      protected $table="nameservers_current_data";
      public $timestamps = false;
-     protected $fillable=['current_data_sets','activation_status'];
+     protected $fillable=['domainid','current_data_sets','activation_status'];
 }

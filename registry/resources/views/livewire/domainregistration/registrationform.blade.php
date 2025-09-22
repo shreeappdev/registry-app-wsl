@@ -1,4 +1,3 @@
-<style>.is_visible{display: none;}</style>
 <div>
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Register Domain</h1>
@@ -38,9 +37,11 @@
                                 <label for="domainname" class="form-label">Domain Name</label>
                                 <div class="input-group">
                                     <input type="text" id="domainname" class="form-control  @error('domainname') is-invalid @enderror"
-                                        placeholder="Enter Domain Name" wire:model.live="domainname" required>
+                                        placeholder="Enter Domain Name" wire:pramukhime="domainname" wire:model.live="domainname" required>
 
                                     <span class="input-group-text">{{ $language_extension->extension ?? '.gov.in' }}</span>
+                                    <input type="hidden" wire:model="extension" name="extension" value="{{ $language_extension->extension ?? '.gov.in' }}">
+
                                     <div class="invalid-feedback">
                                         @error('domainname')
                                             {{ $message }}
@@ -51,13 +52,13 @@
                             </div>
                         </div>
                      {{-- @if ($language_code == 'en')     --}}
-                        <div class="form-group hid is_visible">
+                        <div class="form-group {{ $language_code === 'en' ? '' : 'd-none' }}">
                             <div class="col-md-9">
                                 <label for="hindidomainname" class="form-label">Idn(Hindi) Domain Name</label>
                                 <div class="input-group">
                                     <input type="text"  id="hindidomainname"
                                         class="form-control @error('hindidomainname') is-invalid @enderror"
-                                        placeholder="Enter Hindi Domain Name" wire:model="hindidomainname">
+                                        placeholder="Enter Hindi Domain Name" wire:pramukhime="hindidomainname" wire:model.live="hindidomainname">
                                     <span class="input-group-text">.सरकार.भारत</span>
                                     <div class="invalid-feedback">
                                         @error('hindidomainname')
@@ -253,7 +254,7 @@
                             <div class="col-md-6">
                                 <label for="orgName" class="form-label">Name</label>
                                 <input type="text" class="form-control @error('orgName') is-invalid @enderror"
-                                    placeholder="Enter name" wire:model="orgName">
+                                    placeholder="Enter name" wire:model.live="orgName">
                                 <div class="invalid-feedback">
                                     @error('orgName')
                                         {{ $message }}
@@ -264,7 +265,7 @@
                                 <label for="inputorgDesignation" class="form-label">Designation</label>
                                 <input type="text"
                                     class="form-control @error('orgDesignation') is-invalid @enderror"
-                                    placeholder="Enter designation" wire:model="orgDesignation">
+                                    placeholder="Enter designation" wire:model.live="orgDesignation">
 
                                 <div class="invalid-feedback">
                                     @error('orgDesignation')
@@ -279,7 +280,7 @@
                             <div class="col-md-6">
                                 <label for="orginputAddress1" class="form-label">Address</label>
                                 <input type="text" class="form-control @error('orgAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" placeholder="Enter Address" wire:model="orgAddress1">
+                                    placeholder="Enter Address" placeholder="Enter Address" wire:model.live="orgAddress1">
                                 <div class="invalid-feedback">
                                     @error('orgAddress1')
                                         {{ $message }}
@@ -289,7 +290,7 @@
                             <div class="col-md-6">
                                 <label for="orginputCity" class="form-label">City</label>
                                 <input type="text" class="form-control @error('orgCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model="orgCity">
+                                    placeholder="Enter City" wire:model.live="orgCity">
                                 <div class="invalid-feedback">
                                     @error('orgCity')
                                         {{ $message }}
@@ -317,7 +318,7 @@
                             <div class="col-md-6">
                                 <label for="orginputPincode" class="form-label">Pincode</label>
                                 <input type="text" class="form-control @error('orgPincode') is-invalid @enderror"
-                                    placeholder="Enter Pincode" wire:model="orgPincode" minlength=6>
+                                    placeholder="Enter Pincode" wire:model.live="orgPincode" minlength=6>
 
                                 <div class="invalid-feedback">
                                     @error('orgPincode')
@@ -328,12 +329,12 @@
                         </div>
                         <div class="form-group row g-3">
 
-                            <label for="orgstdcode" class="form-label">Telephone</label>
+                            <label for="orgStdCode" class="form-label">Telephone</label>
                              
 
                                     <div class="col-md-2">
                                         <label for="orgcountrydialcode" class="visually-hidden">Country Code</label>
-                                        <input type="text" id="orgcountrydialcode" class="form-control @error('orgcountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model="orgcountrydialcode" aria-describedby="orgcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                        <input type="text" id="orgcountrydialcode" class="form-control @error('orgcountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model.live="orgcountrydialcode" aria-describedby="orgcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
                                         <div class="invalid-feedback">
                                             @error('orgcountrydialcode')
                                                 {{ $message }}
@@ -344,13 +345,13 @@
                             
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
-                                <input type="text" class="form-control @error('orgstdcode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model="orgstdcode" aria-describedby="stdcode"
+                                <input type="text" class="form-control @error('orgStdCode') is-invalid @enderror"
+                                    placeholder="STD Code" wire:model.live="orgStdCode" aria-describedby="stdcode"
                                     maxlength=4 minlength=2>
 
                                     
                                 <div class="invalid-feedback">
-                                    @error('orgstdcode')
+                                    @error('orgStdCode')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -359,7 +360,7 @@
                                 <label for="inputPassword2" class="visually-hidden">Number</label>
                                 <input type="text"
                                     class="form-control @error('orgTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" placeholder="Telephone Number" wire:model="orgTelehponeNo">
+                                    minlength=4 aria-describedby="telnumber" placeholder="Telephone Number" wire:model.live="orgTelehponeNo">
 
                                 <div class="invalid-feedback">
                                     @error('orgTelehponeNo')
@@ -372,10 +373,10 @@
                         <div class="form-group row g-3">
                             <div class="col-md-4">
                                 <label for="orginputMobile" class="form-label">Mobile No</label>
-                                <input type="text" class="form-control @error('orgmobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" minlength=10 wire:model="orgmobileNo">
+                                <input type="text" class="form-control @error('orgMobileNo') is-invalid @enderror"
+                                    placeholder="Enter Mobile No" minlength=10 wire:model.live="orgMobileNo">
                                 <div class="invalid-feedback">
-                                    @error('orgmobileNo')
+                                    @error('orgMobileNo')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -384,10 +385,10 @@
 
                             <div class="col-md-6">
                                 <label for="orginputEmail" class="form-label">Email Id</label>
-                                <input type="text" class="form-control @error('orgemailid') is-invalid @enderror"
-                                    placeholder="Enter Email" wire:model="orgemailid">
+                                <input type="text" class="form-control @error('orgEmailId') is-invalid @enderror"
+                                    placeholder="Enter Email" wire:model.live="orgEmailId">
                                 <div class="invalid-feedback">
-                                    @error('orgemailid')
+                                    @error('orgEmailId')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -409,7 +410,7 @@
                             <div class="col-md-6">
                                 <label for="adminName" class="form-label">Name</label>
                                 <input type="text" class="form-control @error('adminName') is-invalid @enderror"
-                                    placeholder="Enter Name" wire:model="adminName">
+                                    placeholder="Enter Name" wire:model.live="adminName">
 
                                 <div class="invalid-feedback">
                                     @error('adminName')
@@ -421,7 +422,7 @@
                                 <label for="adminDesignation" class="form-label">Designation</label>
                                 <input type="text"
                                     class="form-control  @error('adminDesignation') is-invalid @enderror"
-                                    placeholder="Enter Designation" wire:model="adminDesignation">
+                                    placeholder="Enter Designation" wire:model.live="adminDesignation">
                                 <div class="invalid-feedback">
                                     @error('adminDesignation')
                                         {{ $message }}
@@ -435,7 +436,7 @@
                                 <label for="admininputAddress" class="form-label">Address</label>
                                 <input type="text"
                                     class="form-control  @error('adminAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" wire:model="adminAddress1">
+                                    placeholder="Enter Address" wire:model.live="adminAddress1">
                                 <div class="invalid-feedback">
                                     @error('adminAddress1')
                                         {{ $message }}
@@ -447,7 +448,7 @@
                             <div class="col-md-6">
                                 <label for="admininputCity" class="form-label">City</label>
                                 <input type="text" class="form-control @error('adminCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model="adminCity">
+                                    placeholder="Enter City" wire:model.live="adminCity">
                                 <div class="invalid-feedback">
                                     @error('adminCity')
                                         {{ $message }}
@@ -458,8 +459,8 @@
                         <div class="form-group row g-3">
                             <div class="col-md-6">
                                 <label for="admininputState" class="form-label">State</label>
-                                <select class="form-control @error('adminCity') is-invalid @enderror"
-                                    wire:model="adminState">
+                                <select class="form-control @error('adminState') is-invalid @enderror"
+                                    wire:model.live="adminState">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
@@ -475,7 +476,7 @@
                                 <label for="admininputPincode" class="form-label">Pincode</label>
                                 <input type="text"
                                     class="form-control @error('adminPincode') is-invalid @enderror"
-                                    placeholder="Enter Pincode" wire:model="adminPincode" minlength=6>
+                                    placeholder="Enter Pincode" wire:model.live="adminPincode" minlength=6>
                                 <div class="invalid-feedback">
                                     @error('adminPincode')
                                         {{ $message }}
@@ -487,11 +488,11 @@
                         <div class="form-group row g-3">
 
                             
-                            <label for="adminstdcode" class="form-label">Telephone</label>
+                            <label for="adminStdCode" class="form-label">Telephone</label>
 
                                 <div class="col-md-2">
-                                    <label for="adminstdcode" class="visually-hidden">Country Code</label>
-                                    <input type="text" id="adminstdcode" class="form-control @error('admincountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}"  wire:model="admincountrydialcode" aria-describedby="admincountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                    <label for="adminStdCode" class="visually-hidden">Country Code</label>
+                                    <input type="text" id="adminStdCode" class="form-control @error('admincountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}"  wire:model.live="admincountrydialcode" aria-describedby="admincountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
 
                                     <div class="invalid-feedback">
                                         @error('admincountrydialcode')
@@ -503,11 +504,11 @@
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
                                 <input type="text"
-                                    class="form-control @error('adminstdcode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model="adminstdcode" aria-describedby="stdcode"
+                                    class="form-control @error('adminStdCode') is-invalid @enderror"
+                                    placeholder="STD Code" wire:model.live="adminStdCode" aria-describedby="stdcode"
                                     maxlength=4 minlength=2>
                                 <div class="invalid-feedback">
-                                    @error('adminstdcode')
+                                    @error('adminStdCode')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -516,7 +517,7 @@
                                 <label for="inputPassword2" class="visually-hidden">Number</label>
                                 <input type="text"
                                     class="form-control @error('adminTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" wire:model="adminTelehponeNo">
+                                    minlength=4 aria-describedby="telnumber" wire:model.live="adminTelehponeNo">
 
                                 <div class="invalid-feedback">
                                     @error('adminTelehponeNo')
@@ -531,10 +532,10 @@
                             <div class="col-md-6">
                                 <label for="admininputMobile" class="form-label">Mobile No</label>
                                 <input type="text"
-                                    class="form-control @error('adminmobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" minlength=10 wire:model="adminmobileNo">
+                                    class="form-control @error('adminMobileNo') is-invalid @enderror"
+                                    placeholder="Enter Mobile No" minlength=10 wire:model.live="adminMobileNo">
                                 <div class="invalid-feedback">
-                                    @error('adminmobileNo')
+                                    @error('adminMobileNo')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -544,10 +545,10 @@
                             <div class="col-md-6">
                                 <label for="admininputEmail" class="form-label">Email Id</label>
                                 <input type="text"
-                                    class="form-control @error('adminemailid') is-invalid @enderror"
-                                    placeholder="Enter Email Id" wire:model="adminemailid">
+                                    class="form-control @error('adminEmailId') is-invalid @enderror"
+                                    placeholder="Enter Email Id" wire:model.live="adminEmailId">
                                 <div class="invalid-feedback">
-                                    @error('adminemailid')
+                                    @error('adminEmailId')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -569,7 +570,7 @@
                             <div class="col-md-6">
                                 <label for="orgName" class="form-label">Name</label>
                                 <input type="text" class="form-control @error('techName') is-invalid @enderror"
-                                    placeholder="Enter Name" wire:model="techName">
+                                    placeholder="Enter Name" wire:model.live="techName">
                                 <div class="invalid-feedback">
                                     @error('techName')
                                         {{ $message }}
@@ -580,7 +581,7 @@
                                 <label for="techDesignation" class="form-label">Designation</label>
                                 <input type="text"
                                     class="form-control @error('techDesignation') is-invalid @enderror"
-                                    placeholder="Enter Designation" wire:model="techDesignation">
+                                    placeholder="Enter Designation" wire:model.live="techDesignation">
                                 <div class="invalid-feedback">
                                     @error('techDesignation')
                                         {{ $message }}
@@ -594,7 +595,7 @@
                                 <label for="techinputAddress" class="form-label">Address</label>
                                 <input type="text"
                                     class="form-control @error('techAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" wire:model="techAddress1">
+                                    placeholder="Enter Address" wire:model.live="techAddress1">
                                 <div class="invalid-feedback">
                                     @error('techAddress1')
                                         {{ $message }}
@@ -605,7 +606,7 @@
                             <div class="col-md-6">
                                 <label for="techinputCity" class="form-label">City</label>
                                 <input type="text" class="form-control @error('techCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model="techCity">
+                                    placeholder="Enter City" wire:model.live="techCity">
                                 <div class="invalid-feedback">
                                     @error('techCity')
                                         {{ $message }}
@@ -617,7 +618,7 @@
                             <div class="col-md-6">
                                 <label for="techinputState" class="form-label">State</label>
                                 <select class="form-control @error('techState') is-invalid @enderror"
-                                    wire:model="techState">
+                                    wire:model.live="techState">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
@@ -632,7 +633,7 @@
                             <div class="col-md-6">
                                 <label for="techinputPincode" class="form-label">Pincode</label>
                                 <input type="text" class="form-control @error('techPincode') is-invalid @enderror"
-                                    wire:model="techPincode" placeholder="Enter Pincode" minlength=6>
+                                    wire:model.live="techPincode" placeholder="Enter Pincode" minlength=6>
                                 <div class="invalid-feedback">
                                     @error('techPincode')
                                         {{ $message }}
@@ -642,11 +643,11 @@
                         </div>
 
                         <div class="form-group row g-3">
-                            <label for="techstdcode" class="form-label">Telephone</label>
+                            <label for="techStdCode" class="form-label">Telephone</label>
 
                             <div class="col-md-2">
                                     <label for="techcountrydialcode" class="visually-hidden">Country Code</label>
-                                    <input type="text" id="techstdcode" class="form-control @error('techcountrydialcode') is-invalid @enderror"  placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model="techcountrydialcode" aria-describedby="techcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                    <input type="text" id="techStdCode" class="form-control @error('techcountrydialcode') is-invalid @enderror"  placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model.live="techcountrydialcode" aria-describedby="techcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
                                        
                                     <div class="invalid-feedback">
                                         @error('techcountrydialcode')
@@ -656,11 +657,11 @@
                                 </div>
                             <div class="col-md-2">
                                 <label for="stdCode" class="visually-hidden">Std Code</label>
-                                <input type="text" class="form-control @error('techstdcode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model="techstdcode" aria-describedby="stdcode"
+                                <input type="text" class="form-control @error('techStdCode') is-invalid @enderror"
+                                    placeholder="STD Code" wire:model.live="techStdCode" aria-describedby="stdcode"
                                     maxlength=4 minlength=2>
                                 <div class="invalid-feedback">
-                                    @error('techstdcode')
+                                    @error('techStdCode')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -669,7 +670,7 @@
                                 <label for="inputPassword2" class="visually-hidden">Number</label>
                                 <input type="text"
                                     class="form-control @error('techTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" wire:model="techTelehponeNo">
+                                    minlength=4 aria-describedby="telnumber" wire:model.live="techTelehponeNo">
 
                                 <div class="invalid-feedback">
                                     @error('techTelehponeNo')
@@ -683,10 +684,10 @@
                             <div class="col-md-6">
                                 <label for="techinputMobile" class="form-label">Mobile No</label>
                                 <input type="text"
-                                    class="form-control @error('techmobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" wire:model="techmobileNo" minlength=10>
+                                    class="form-control @error('techMobileNo') is-invalid @enderror"
+                                    placeholder="Enter Mobile No" wire:model.live="techMobileNo" minlength=10>
                                 <div class="invalid-feedback">
-                                    @error('techmobileNo')
+                                    @error('techMobileNo')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -695,10 +696,10 @@
                             <div class="col-md-6">
                                 <label for="techinputEmail" class="form-label">Email Id</label>
                                 <input type="text"
-                                    class="form-control  @error('techEmailid') is-invalid @enderror"
-                                    placeholder="Enter Email Id" wire:model="techEmailid">
+                                    class="form-control  @error('techEmailId') is-invalid @enderror"
+                                    placeholder="Enter Email Id" wire:model.live="techEmailId">
                                 <div class="invalid-feedback">
-                                    @error('techEmailid')
+                                    @error('techEmailId')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -726,49 +727,77 @@
 
 
                             @if(!$isChecked)
-                                <div class="col-12">
+                                
+                                <!--Nic nameservers-->
+                                {{-- <div class="row mt-3"> --}}
+                                    
                                     @foreach ($multipleip as $index => $entry)
-                                        <div class="row my-2 nameserverGroup">
-                                            <div class="col">
-                                                <input type="text"
-                                                    wire:model="multipleip.{{ $index }}.nshostname"
-                                                    placeholder="Hostname for IP "
-                                                    class="form-control hostnameClass @error('multipleip.*') is-invalid @enderror"
-                                                    placeholder="Nameserver 1" aria-label="Nameserver 1">
-                                            </div>
-                                            <div class="col mappedip-group">
-                                                <input type="text" wire:model="multipleip.{{ $index }}.ip"
-                                                    placeholder="IP Address for IP " class="form-control ipClass"
-                                                    placeholder="IP of Nameserver">
+                                        <div class="col-sm-6 mt-3">
+                                             <div class="card"> 
+                                               <div class="card-body">
+                                                    <input type="text" wire:model.live="multipleip.{{ $index }}.nshostname" placeholder="Enter Nameserver" class="form-control mb-3 hostnameClass @error('multipleip.'.$index.'.nshostname') is-invalid @enderror" aria-label="Nameserver 1">
+                                                   
+                                                    @error("multipleip.$index.nshostname")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
 
-                                            </div>
-                                            @if ($index >= 2)
-                                                <div class="col">
-                                                    <button type="button"
-                                                        class="btn btn-outline-danger remove-button"
-                                                        wire:click="removeEntry({{ $index }})">Remove</button>
+                                                    @if(Str::endsWith($entry['nshostname'], '.gov.in'))
+                                                        @foreach ($entry['ip'] as $ipIndex => $ip)
+                                                            <div class="input-group mb-2">
+                                                                <input type="text"
+                                                                    wire:model="multipleip.{{ $index }}.ip.{{ $ipIndex }}"
+                                                                    placeholder="IP Address"
+                                                                    class="form-control ipClass  @error('multipleip.'.$index.'.ip.'.$ipIndex) is-invalid @enderror"
+                                                                    aria-label="IP of Nameserver">
+
+                                                                <!-- Add IP (only on last IP field) -->
+                                                                @if ($loop->first && count($entry['ip']) < 5)
+                                                                    <span class="input-group-text"
+                                                                        wire:click="addIp({{ $index }})"
+                                                                        style="cursor:pointer;">
+                                                                        <i class="fa fa-plus-circle" style="color:green; font-size:20px;"></i>
+                                                                    </span>
+                                                                @endif
+
+                                                                <!-- Remove IP (if more than 1) -->
+                                                                @if ($ipIndex > 0)
+                                                                    <span class="input-group-text"
+                                                                        wire:click="removeIp({{ $index }}, {{ $ipIndex }})"
+                                                                        style="cursor:pointer;">
+                                                                        <i class="fa fa-minus-circle" style="color:red; font-size:20px;"></i>
+                                                                    </span>
+                                                                @endif
+
+                                                                @error("multipleip.$index.ip.$ipIndex")
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
+
+                                                    @if( $index >1 ) 
+                                                    <i class="fa-regular fa-trash-can mt-3" style="color:red;cursor:pointer;" wire:click="removeEntry({{ $index }})"></i> 
+                                                    @endif
                                                 </div>
-                                            @else
-                                                <div class="col"></div>
-                                            @endif
+                                            </div>
                                         </div>
                                     @endforeach
+                                {{-- </div> --}}
+                                {{-- @error('multipleip.*')
+                                    <div class="alert alert-danger"> {{ $message }} </div>
+                                @enderror --}}
 
-                                    @error('multipleip.*')
-                                        <div class="alert alert-danger"> {{ $message }} </div>
-                                    @enderror
-
-                                    @if (count($multipleip) < 6)
-                                        <div class="row my-2">
-                                            <div class="col">
-                                                <button type="button" wire:click="addEntry"
-                                                    class="btn btn-dark btn-sm"> Add
-                                                    Nameserver <i class="fas fa-plus"></i></button>
-                                            </div>
+                                @if (count($multipleip) < 5)
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <button type="button" wire:click="addEntry"
+                                                class="btn btn-success btn-sm"> Add
+                                                Nameserver <i class="fas fa-plus"></i></button>
                                         </div>
-                                    @endif
-                                </div>
-                                <!--Nic nameservers-->
+                                    </div>
+                                @endif
+                                        
                             @else
                                 <div class="col-12">
 
@@ -837,8 +866,7 @@
             let translateCode = $(this).find('option:selected').attr('translatorCode');
 
             if (language === 'en') {
-                console.log('iff')
-                $('.hid').removeClass('is_visible');
+               
                 pramukhIME.disable('domainname');
 
                     if ($('#hindidomainname').length) {
@@ -848,9 +876,7 @@
                     }
         
             } else {
-                console.log('else');
-            $('.hid').addClass('is_visible');
-
+                
                 if ($('#domainname').length) {
                     pramukhIME.addLanguage(PramukhIndic);
                     pramukhIME.setLanguage(translateCode, 'pramukhindic');
@@ -858,6 +884,16 @@
                 }
             }
         });
+
+        /**
+         * Force Livewire to sync input values
+         * (PramukhIME does not trigger native input events)
+         */
+        $(document).on('keyup change', '#domainname, #hindidomainname', function () {
+            this.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
         // keyboard cl
+
     </script>
 @endpush

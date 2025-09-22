@@ -33,6 +33,7 @@ class Registrationform extends Component
     public $region;
     public $isaddOrganisation=false;
     public $customMsg = '';
+    public $ips = [];
     // public $states=[];
 
     /**Multi dropdown */
@@ -59,9 +60,9 @@ class Registrationform extends Component
     public $orgState;
     public $orgPincode;
     public $orgTelehponeNo;
-    public $orgstdcode;
-    public $orgmobileNo;
-    public $orgemailid;
+    public $orgStdCode;
+    public $orgMobileNo;
+    public $orgEmailId;
     public $orgcountrydialcode;
 
     /** Third step */
@@ -74,9 +75,9 @@ class Registrationform extends Component
     public $adminState;
     public $adminPincode;
     public $adminTelehponeNo;
-    public $adminstdcode;
-    public $adminmobileNo;
-    public $adminemailid;
+    public $adminStdCode;
+    public $adminMobileNo;
+    public $adminEmailId;
     public $admincountrydialcode;
 
     /** Fourth step */
@@ -89,9 +90,9 @@ class Registrationform extends Component
     public $techState;
     public $techPincode;
     public $techTelehponeNo;
-    public $techstdcode;
-    public $techmobileNo;
-    public $techEmailid;
+    public $techStdCode;
+    public $techMobileNo;
+    public $techEmailId;
     public $techcountrydialcode;
 
 
@@ -109,13 +110,19 @@ class Registrationform extends Component
         public function mount(){
 
             $this->currentStep = 1;
-            $this->multipleip = ['nshostname' => '', 'ip' => []];
+            // $this->multipleip = ['nshostname' => '', 'ip' => []];
+            $this->multipleip = [
+                                    ['nshostname' => '', 'ip' => ['']],
+                                    ['nshostname' => '', 'ip' => ['']],
+                                ];
             $this->isaddOrganisation = false;
             $this->isdepartmentVisible = false;
         }
 
-        public function increaseStep(){
- dd('org',$this->selectedOrganisation,'min',$this->selectedMinistry,'dept',$this->selectedDepartment);
+        public function increaseStep(){    
+            //                             $ext = IdnLanguage::where('lang_code',$this->language_code)->first();
+
+             
             $this->resetErrorBag();
             $this->validateData();
             $this->currentStep++;
@@ -144,20 +151,12 @@ class Registrationform extends Component
                 'selectedOrganisation' => 'required_if:addnewOrganisation,""',
                 'selectedState' => 'required_if:region,2',
                 'selectedMinistry' => 'required_if:region,1',
-                // 'selectedDepartment' => [new SelectedDepartmentRequired($this->selectedOrgcategory)],
                 'selectedDepartment' => 'required_if:selectedOrgcategory,4,10',
-                'addnewOrganisation' => 'nullable|regex:/^[a-zA-Z\s]+$/',
-
-                // 'addnewOrganisation' =>  [
-                //                              function ($attribute, $value, $fail) {
-                //                                 if (in_array($this->selectedOrganisation, [10, 11]) 
-                //                                     && empty($this->selectedOrganisation) 
-                //                                     && empty($value)) {
-                //                                     // $fail('The Add Organisation field is required when your organisation does not exist in organisation field.');
-                //                                      $fail(__('validation.custom.addnewOrganisation.required'));
-                //                                 }
-                //                             }
-                //                         ],
+                'addnewOrganisation' => [
+                                            'nullable',
+                                            'regex:/^[a-zA-Z\s]+$/',
+                                            'required_without:selectedOrganisation',
+                                        ],
 
             ];
         }
@@ -175,219 +174,115 @@ class Registrationform extends Component
                 'selectedState.required_if' => 'State is required.',
                 'selectedDepartment.required_if' => 'Department is required.',
                 'addnewOrganisation.regex' => 'The organisation name may only contain letters and spaces.',
+                'addnewOrganisation.required_without' => 'Please Add Organization if your organization is not available.',
 
             ];
         }  
-    
-        public function validateData()
+
+
+        protected function rulesForStep5()
         {
-            dd(343);
-            $rulesMethod = "rulesForStep{$this->currentStep}";
-            $messagesMethod = "messagesForStep{$this->currentStep}";
+            $rules = [
+                'multipleip.*.nshostname' => [
+                    'required',
+                    'regex:/^(?=.{1,253}$)(?!-)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/'
+                ],
+            ];
 
-            $this->validate($this->$rulesMethod(), $this->$messagesMethod());
+            foreach ($this->multipleip as $index => $entry) {
+                if (!empty($entry['nshostname']) && str_ends_with($entry['nshostname'], '.gov.in')) {
+                    $rules["multipleip.$index.ip.*"] = 'required|ip';
+                }
+            }
 
-            // Extra condiional validation
-            // if (in_array($this->selectedOrganisation, [10, 11]) && empty($this->selectedOrganisation)){
-            //  $this->validate($this->$rulesMethod(), $this->$messagesMethod());
-            // }
+            return $rules;
         }
 
-        public function validateData22(){
+
+        private function messagesForStep5()
+        {
+            return [
+                    'multipleip.*.nshostname.required' => 'Each nameserver must have a hostname.',
+                    'multipleip.*.nshostname.regex'    => 'Each nameserver must be a valid hostname.',
+                    'multipleip.*.ip.*.required'       => 'IP address is required when hostname ends with .gov.in.',
+                    'multipleip.*.ip.*.ip'             => 'Each IP must be a valid IPv4 or IPv6 address.',
+                   ];
+        }
+
+        private function rules($prefixStr)
+        {
+            return [
+                $prefixStr.'Name'=>['required','max:200','regex:/^[a-zA-Z\s]+$/'],
+                $prefixStr.'Designation'=>['required','regex:/^[a-zA-Z\s]+$/'],
+                $prefixStr.'MobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
+                $prefixStr.'EmailId'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
+                $prefixStr.'City'=>['required','regex:/^[a-zA-Z\s]+$/'],
+                $prefixStr.'State'=>'required',
+                $prefixStr.'Pincode' => ['required','digits:6'],
+                $prefixStr.'TelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
+                $prefixStr.'StdCode'=>'required|regex:/^[0-9]{2,4}+$/',
+                $prefixStr.'Address1' => ['required','string','min:5','max:255','regex:/^(?!\d+$)[A-Za-z0-9\s,.\-#]+$/' ],
 
 
-            if( $this->currentStep == 1){
-                    $this->validate([
-                        'region'=>'required',
-                        'language_code'=>'required',
-                        'domainname'=>['required',new DomainRule()],
-                        'hindidomainname'=>'required_if:language_code,en',
-                        'selectedOrgcategory'=>'required',
-                        'selectedMinistry'=>'required_if:region,1',
-                    // 'state_domain'=>'required_if:region,2',
-                        'selectedDepartment'=>[new SelectedDepartmentRequired($this->selectedOrgcategory)],       
-                    ],
-                    [
-                        'region.required' => 'Please select region',
-                        'language_code.required' => 'Please select language',
-                        'domainname.required' => 'Domain name is required',
-                        'domainname.regex' => 'Domain name should be in format',
-                        'hindidomainname.required_if' => 'Hindi Domain name is required',
-                        //'hindidomainname.regex' => 'Hindi Domain name should be in format',
-                        'selectedMinistry.required_if'=>'Please select ministry in case of selected region is Central',
-                    // 'state_domain.required_if'=>'Please select state in case of selected region is State/UT',
-                        'selectedOrgcategory.required' => 'Organisation Category is required',
-                        'language.required' => 'Please choose language of domain',
-                        'selectedMinistry.required_if'=>'Please select ministry',
-                        //'state_domain.required_if'=>'Please select state',
-                    ]);
+            ];
+        }
 
-                    if (empty($this->selectedOrganisation) && empty($this->addnewOrganisation)) {
-
-                        if (count($this->organisations) > 0) {
-                            $this->validate([
-                                'selectedOrganisation' => 'required',
-                            ], [
-                                'selectedOrganisation.required' => 'Please select an organisation from the list',
-                            ]);
-                        } else {
-                            $this->validate([
-                                'addnewOrganisation' => 'required|regex:/^[a-zA-Z\s]+$/',
-                            ], [
-                                'addnewOrganisation.required' => 'Organisation name is required',
-                                'addnewOrganisation.regex' => 'Only character and space is allowed',
-                            ]);
-                        }
-                    }
-            }
-            if( $this->currentStep == 2){
-
-                $this->validate([
-                    'orgName'=>'required',
-                    'orgDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                    'orgmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
-                    'orgemailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
-                    'orgCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                    'orgState'=>'required',
-                    'orgPincode'=>'required |min:6 |numeric',
-                    'orgTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
-                    'orgstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
-                    'orgAddress1'=>'required',
+        private function messages($prefixStr)
+        {
+            return [
+                $prefixStr.'Name.required' => 'Name is required',
+                $prefixStr.'Name.regex'=>'Only character and space is allowed',
+                $prefixStr.'City.required' => 'City is required',
+                $prefixStr.'City.regex'=>'Only character and space is allowed',
+                $prefixStr.'State.required' => 'State is required',
+                $prefixStr.'Pincode.required' => 'Pincode is required.',
+                $prefixStr.'Pincode.digits' => 'Pincode must be exactly 6 digits.',
+                $prefixStr.'Address1.required' => 'Address is required.',
+                $prefixStr.'Address1.string' => 'Address must be a valid string.',
+                $prefixStr.'Address1.min' => 'Address must be at least 5 characters.',
+                $prefixStr.'Address1.max' => 'Address may not be greater than 255 characters.',
+                $prefixStr.'Address1.regex' => 'Address cannot be only numbers and may only contain letters, numbers, spaces, commas, periods, dashes, or #.',
+                $prefixStr.'Designation.required' => 'Designation is required',
+                $prefixStr.'Designation.regex'=>'Only character and space is allowed',
+                $prefixStr.'EmailId.required' =>'Email id is required',
+                $prefixStr.'EmailId.regex'=>'Email id will be @nic.in or @gov.in',
+                $prefixStr.'TelehponeNo.required' => 'Telephone No is required',
+                $prefixStr.'TelehponeNo.regex'=>'Telephone No should be minimum 4 digits and maximum 8 digits',
+                $prefixStr.'StdCode.required'=>'Please enter STD code',
+                $prefixStr.'StdCode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
+                $prefixStr.'MobileNo.required' =>'Mobile No is required',
+                $prefixStr.'MobileNo.regex'=>'The mobile number must be 10 digits and should not start with 0',
                 
-                ],
-                [
-                    'orgName.required' => 'Name is required',
-                    'orgCity.required' => 'City is required',
-                    'orgState.required' => 'State is required',
-                    'orgPincode.required' => 'Pincode is required',
-                    'orgAddress1.required' =>'Address is required',
-                    'orgDesignation.required' => 'Designation is required',
-                    'orgDesignation.regex'=>'Only character and space is allowed',
-                    'orgemailid.required' =>'Email id is required',
-                    'orgemailid.regex'=>'Email id will be @nic.in or @gov.in',
-                    'orgTelehponeNo.required' => 'Telephone No is required',
-                    'orgTelehponeNo.regex'=>'Telephone No should be minimum 4 digits and maximum 8 digits',
-                    'orgstdcode.required'=>'Please enter STD code',
-                    'orgstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
-                    'orgmobileNo.required' =>'Mobile No is required',
-                    'orgmobileNo.regex'=>'The mobile number must be 10 digits and should not start with 0',
-                
-                
-                ]);
+            ];
+        }  
 
+        
+        public function validateData()
+        {
+            
+            if($this->currentStep == 1){
+                $this->validate($this->rulesForStep1(), $this->messagesForStep1());
 
-                if ($this->selectedMinistry == 14) {
-                    $this->validate([
-                        'orgcountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
-                    ], [
-                        'orgcountrydialcode.required' => 'Please enter country code',
-                        'orgcountrydialcode.regex' => 'Country code should be in format',
-                    ]);
-                }   
-            }
-            if( $this->currentStep == 3){
-                
-                    $this->validate([
-                        'adminName'=>'required',
-                        'adminDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                        'adminmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
-                        'adminemailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
-                        'adminCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                        'adminState'=>'required',
-                        'adminPincode'=>'required|min:6|numeric',
-                        'adminTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
-                        'adminstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
-                        'adminAddress1' =>'required',
-                    
-                    ],
-                    [
-                        'adminName.required' => 'Name is required',
-                        'adminCity.required' => 'City is required',
-                        'adminState.required' => 'State is required',
-                        'adminPincode.required' => 'Pincode is required',
-                        'adminAddress1.required' =>'Address is required',
-                        'adminDesignation.required' => 'Designation is required',
-                        'adminDesignation.regex'=>'Only character and space is allowed',
-                        'adminemailid.regex'=>'Email id will be @nic.in or @gov.in',
-                        'adminemailid.different'=>'The organisation emailid and Administrative emial id should not be same',
-                        'adminemailid.required' =>'Email id is required',
-                        'adminTelehponeNo.required' => 'Telephone No is required',
-                        'adminTelehponeNo.regex' => 'Telephone No should be minimum 4 digits and maximum 8 digits',
-                        'adminstdcode.required'=>'Please enter STD code',
-                        'adminstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
-                        'adminmobileNo.regex'=>'Mobile No should be 10 digit and ot start with 0 ',
-                        'adminmobileNo.required' =>'Mobile No is required',
-                
-                    ]);
+            }elseif(in_array($this->currentStep,[2,3,4])){
 
-                        if ($this->selectedMinistry == 14) {
-                            $this->validate([
-                                'admincountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
-                            ], [
-                                'admincountrydialcode.required' => 'Please enter country code',
-                                'admincountrydialcode.regex' => 'Country code should be in format',
-                            ]);
-                        }
-                }
-            if( $this->currentStep == 4){
+                if($this->currentStep == 2){
+                    $prefixStr = 'org';
+                } elseif($this->currentStep == 3){
+                    $prefixStr = 'admin';
+                } elseif($this->currentStep == 4){
+                    $prefixStr = 'tech';
+                }else{
+                    $prefixStr='';
+                }                
+                $this->validate($this->rules($prefixStr), $this->messages($prefixStr));
 
-                $this->validate([
-                    'techName'=>'required',
-                    'techDesignation'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                    'techmobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
-                    'techEmailid'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
-                    'techCity'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                    'techState'=>'required',
-                    'techPincode'=>'required|min:6|numeric',
-                    'techTelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
-                    'techstdcode'=>'required|regex:/^[0-9]{2,4}+$/',
-                    'techAddress1' =>'required',
-                
-                ],
-                [
-                    'techName.required' => 'Name is required',
-                    'techDesignation.required' => 'Designation is required',
-                    'techCity.required' => 'City is required',
-                    'techState.required' => 'State is required',
-                    'techPincode.required' => 'Pincode is required',
-                    'techAddress1.required' =>'Address is required',
-                    'techDesignation.regex'=>'Only character and space is allowed',
-                    'techEmailid.required' =>'Email id is required',
-                    'techEmailid.regex'=>'Email id will be @nic.in or @gov.in',
-                    'techTelehponeNo.required' => 'Telephone No is required',
-                    'techTelehponeNo.regex' => 'Telephone No should be minimum 4 digits and maximum 8 digits',
-                    'techmobileNo.required' =>'Mobile No is required',
-                    'techmobileNo.regex' => 'Mobile No should be minimum 10 digits and should not start with 0',
-                    'techstdcode.required'=>'Please enter STD code',
-                    'techstdcode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
-                    
-                
-                ]);
-                
-                    if ($this->selectedMinistry == 14) {
-                        $this->validate([
-                            'techcountrydialcode' => ['required', 'regex:/^\+?[0-9]{1,4}$/'],
-                        ], [
-                            'techcountrydialcode.required' => 'Please enter country code',
-                            'techcountrydialcode.regex' => 'Country code should be in format',
-                        ]);
-                    }
-            } 
-            if( $this->currentStep == 5){
+            }elseif( $this->currentStep == 5 ){
 
                 if (!$this->isChecked) {
-                        if (count($this->multipleip) < 2) {
-                            $this->addError('multipleip', 'Add minimum two nameservers');
-                        } else {
-                            $this->validate([
-                                'multipleip.*.nshostname' => 'required',
-                            ], [
-                                'multipleip.*.nshostname.required' => 'Each nameserver must have a hostname',
-                            ]);
-                        }
-                    }
-
+                    $this->validate($this->rulesForStep5(), $this->messagesForStep5());
                 }
+    
+            }
         }
 
         public function updatedIsChecked($value)
@@ -396,199 +291,243 @@ class Registrationform extends Component
             // $value contains the updated value of the checkbox (true or false)
             if ($value) {
                 $this->multipleip = [
-                    ['nshostname' => 'ns1.nic.in', 'ip' => ''],
-                    ['nshostname' => 'ns2.nic.in', 'ip' => ''],
-                    ['nshostname' => 'ns7.nic.in', 'ip' => ''],
-                    ['nshostname' => 'ns10.nic.in','ip' => ''],
+                    ['nshostname' => 'ns1.nic.in', 'ip' => ['']],
+                    ['nshostname' => 'ns2.nic.in', 'ip' => ['']],
+                    ['nshostname' => 'ns7.nic.in', 'ip' => ['']],
+                    ['nshostname' => 'ns10.nic.in','ip' => ['']],
                 ];
             } else {
-                $this->multipleip = ['nshostname' => '', 'ip' => []];
+                // $this->multipleip = ['nshostname' => '', 'ip' => []];
+                 $this->multipleip = [
+                                        ['nshostname' => '', 'ip' => ['']],
+                                        ['nshostname' => '', 'ip' => ['']],
+                                    ];
             }
         }
         public function addEntry()
         {
-            $this->multipleip[] = ['nshostname' => '', 'ip' => ''];
+            $this->multipleip[] = ['nshostname' => '', 'ip' => ['']];
         }
     
-    public function removeEntry($index)
-    {
-        if($index > 1){
-            unset($this->multipleip[$index]);
-            $this->multipleip = array_values($this->multipleip);
+        public function removeEntry($index)
+        {
+            if($index > 1){
+                unset($this->multipleip[$index]);
+                $this->multipleip = array_values($this->multipleip);
+            }
         }
-    }
 
+         // add IP field inside a specific entry
+        public function addIp($entryIndex)
+        {
+             if (count($this->multipleip[$entryIndex]['ip']) < 5) {   // max 5
+              $this->multipleip[$entryIndex]['ip'][] = '';
+             }
+        }
 
-    public function register(){
+        // remove IP field from a specific entry
+        public function removeIp($entryIndex, $ipIndex)
+        {
+            unset($this->multipleip[$entryIndex]['ip'][$ipIndex]);
+            $this->multipleip[$entryIndex]['ip'] = array_values($this->multipleip[$entryIndex]['ip']);
+        }
 
-            $this->validateData();
-            try {
-                DB::beginTransaction();
-             
-                    $domainname= $this->domainname.'.gov.in';
-                    $domainid='DM'.date('dmy').date('his');
-                    $organisationcontact = 'ORGC'.date('dmy').date('his');
-                    $admincontact = 'ADMN'.date('dmy').date('his');
-                    $techcontact = 'TECH'.date('dmy').date('his');
-                    $idndomainid ='IDN'.date('dmy').date('his');
-                    $currentDate=date('Y-m-d H:i:s');
+        public function register(){
 
-                     /**Add organisation if it doesn't exist */
+                $this->validateData();
+                try {
 
-                    if(!empty($this->addnewOrganisation) && empty($this->selectedOrganisation)){
+                        DB::beginTransaction();
 
-                        $org = Organisation::insert([
-                            'org_name'=> $this->addnewOrganisation,
-                            'm_id'=>$this->selectedMinistry,
-                            'dept_id'=>$this->selectedDepartment,
-                            'orgcat_id'=>$this->selectedOrgcategory,
-                            'state_utcode'=>$this->region == 2 ? $this->selectedState : 'cu',
+                     
+                        
+
+//dd($this->adminStdCode,$this->orgStdCode,$this->techStdCode);
+                        $extension = '.gov.in'; // default
+
+                        if ($this->language_code !== 'en') {
+                            $ext = IdnLanguage::where('lang_code', $this->language_code)->first();
+                            $extension = $ext->extension ?? '.gov.in'; 
+                        }
+
+                        $fullDomain = $this->domainname . $extension;
+
+                       
+                        $domainname    = $this->language_code === 'en' ? $fullDomain : Punycode::encodeHostName($fullDomain);
+                        $dname_decoded = $fullDomain;
+                        $domainid='DM'.date('dmy').date('his');
+                        $organisationcontact = 'ORGC'.date('dmy').date('his');
+                        $admincontact = 'ADMN'.date('dmy').date('his');
+                        $techcontact = 'TECH'.date('dmy').date('his');
+                        $idndomainid ='IDN'.date('dmy').date('his');
+                        $currentDate=date('Y-m-d H:i:s');
+
+                        /**Add organisation if it doesn't exist */
+
+                        if(!empty($this->addnewOrganisation) && empty($this->selectedOrganisation)){
+
+                            $org = Organisation::insert([
+                                'org_name'=> $this->addnewOrganisation,
+                                'm_id'=>$this->selectedMinistry,
+                                'dept_id'=>$this->selectedDepartment,
+                                'orgcat_id'=>$this->selectedOrgcategory,
+                                'state_utcode'=>$this->region == 2 ? $this->selectedState : 'cu',
+                            ]);
+
+                            $this->selectedOrganisation = $org->org_id;
+
+                        }
+
+                
+                        /** Main domain table insert */
+                        Domain::create([
+                            'domainid' => $domainid,
+                            'domainname' => $domainname,
+                            'lang' =>$this->language_code,
+                            'dname_decoded_punycode' => $dname_decoded,
+                            'registrantid' => date('his'),
+                            'companyid' =>  $organisationcontact,
+                            'adminid' =>  $admincontact,
+                            'techid' => $techcontact,
+                            'registrationdate' => $currentDate,
+                            'state_utcode' =>  $this->selectedState,
+                            'orgcategory' => $this->selectedOrgcategory,
+                            'region' => $this->region,
+                            'ministry' => $this->selectedMinistry,
+                            'dept' => $this->selectedDepartment,
+                            'org_id' => $this->selectedOrganisation,
+                            'has_idns'=>$this->language_code == 'en'? 1 : 0,
+                            'remarks' =>''
+                            
                         ]);
 
-                        $this->selectedOrganisation = $org->org_id;
+                        /**Hindi domain insert */
+                        if($this->language_code == 'en'){
+                            Idndomain::insert([
+                                'domainname'=> Punycode::encodeHostName($this->hindidomainname.'.सरकार.भारत'),
+                                'master_domainid'=>$domainid,
+                                'domainid'=>$idndomainid,
+                                'lang'=>'hin-deva'
+                            ]);
+                        }
+                       
+                        //insert in Organistion contacts
+                    
+                        Contact::create([
+                                'contactid'=>$organisationcontact,
+                                'c_name' => $this->orgName,
+                                'designation' => $this->orgDesignation,
+                                'address1' => $this->orgAddress1,
+                                'address2' => $this->orgAddress2,
+                                'city' => $this->orgCity,
+                                'state' => $this->orgState,
+                                'countryid' => 'India',
+                                'pincode' => $this->orgPincode,
+                                'telephone_std_code' => $this->orgStdCode,
+                                'telephone' => $this->orgTelehponeNo,
+                                'mobileno' => $this->orgMobileNo,
+                                'email' => $this->orgEmailId,
+                            ]);
 
-                    }
-
-               
-                    /** Main domain table insert */
-                    Domain::create([
-                        'domainid' => $domainid,
-                        'domainname' => $domainname,
-                        'lang' =>$this->language_code,
-                        'dname_decoded_punycode' => '',
-                        'registrantid' => '',
-                        'companyid' =>  $organisationcontact,
-                        'adminid' =>  $admincontact,
-                        'techid' => $techcontact,
-                        'registrationdate' => $currentDate,
-                        'state_utcode' =>  $this->selectedState,
-                        'orgcategory' => $this->selectedOrgcategory,
-                        'region' => $this->region ==1?'cu':$this->selectedState,
-                        'ministry' => $this->selectedMinistry,
-                        'dept' => $this->selectedDepartment,
-                        'org_id' => $this->selectedOrganisation,
-                        'has_idns'=>1,
-                        'remarks' =>''
-                        
-                    ]);
-
-                    /**Hindi domain insert */
-
-                    Idndomain::insert([
-                        'domainname'=> Punycode::encodeHostName($this->hindidomainname.'.सरकार.भारत'),
-                        'master_domainid'=>$domainid,
-                        'domainid'=>$idndomainid,
-                        'lang'=>'hin-deva'
-                    ]);
-
-                   
-
-                    //insert in Organistion contacts
-                
-                    Contact::create([
-                            'contactid'=>$organisationcontact,
-                            'c_name' => $this->orgName,
-                            'designation' => $this->orgDesignation,
-                            'address1' => $this->orgAddress1,
-                            'address2' => $this->orgAddress2,
-                            'city' => $this->orgCity,
-                            'state' => $this->orgState,
+                            
+                        //insert in Admin contacts
+            
+                        Contact::create([
+                            'contactid'=>$admincontact,
+                            'c_name' => $this->adminName,
+                            'designation' => $this->adminDesignation,
+                            'address1' => $this->adminAddress1,
+                            'address2' => $this->adminAddress2,
+                            'city' => $this->adminCity,
+                            'state' => $this->adminState,
                             'countryid' => 'India',
-                            'pincode' => $this->orgPincode,
-                            'telephone_std_code' => $this->orgstdcode,
-                            'telephone' => $this->orgTelehponeNo,
-                            'mobileno' => $this->orgmobileNo,
-                            'email' => $this->orgemailid,
-                         ]);
+                            'pincode' => $this->adminPincode,
+                            'telephone_std_code' => $this->adminStdCode,
+                            'telephone' => $this->adminTelehponeNo,
+                            'mobileno' => $this->adminMobileNo,                    
+                            'email' => $this->adminEmailId
+                        ]);
 
-                        
-                     //insert in Admin contacts
-         
-                   Contact::create([
-                        'contactid'=>$admincontact,
-                        'c_name' => $this->adminName,
-                        'designation' => $this->adminDesignation,
-                        'address1' => $this->adminAddress1,
-                        'address2' => $this->adminAddress2,
-                        'city' => $this->adminCity,
-                        'state' => $this->adminState,
-                        'countryid' => 'India',
-                        'pincode' => $this->adminPincode,
-                        'telephone_std_code' => $this->adminstdcode,
-                        'telephone' => $this->adminTelehponeNo,
-                        'mobileno' => $this->adminmobileNo,                    
-                        'email' => $this->adminemailid
-                    ]);
+                        //insert in Technical contacts
+                        Contact::create([
+                                'contactid'=>$techcontact,
+                                'c_name' => $this->techName,
+                                'designation' => $this->techDesignation,
+                                'address1' => $this->techAddress1,
+                                'address2' => $this->techAddress2,
+                                'city' => $this->techCity,
+                                'state' => $this->techState,
+                                'countryid' => 'India',
+                                'pincode' => $this->techPincode,
+                                'telephone_std_code' => $this->techStdCode,
+                                'telephone' => $this->techTelehponeNo,
+                                'mobileno' => $this->techMobileNo,
+                                'email' => $this->techEmailId,
+                        ]);
 
+                        /** Nameserver Data */
+                        Nameserver_data::create([
+                                'domainid' => $domainid,
+                                'current_data_sets' => serialize($this->multipleip),
+                                'activation_status' => 'Pending',
+                            ]);
 
-                    //insert in Technical contacts
-
-                   Contact::create([
-                        'contactid'=>$techcontact,
-                        'c_name' => $this->techName,
-                        'address1' => $this->techAddress1,
-                        'address2' => $this->techAddress2,
-                        'city' => $this->techCity,
-                        'state' => $this->techState,
-                        'countryid' => 'India',
-                        'pincode' => $this->techPincode,
-                        'telephone_std_code' => $this->techstdcode,
-                        'telephone' => $this->techTelehponeNo,
-                        'mobileno' => $this->techmobileNo,
-                        'email' => $this->techEmailid,
-                    ]);
-                  /** Nameserver Data */
-                  Nameserver_data::create([
-                        'current_data_sets' => serialize($this->multipleip),
-                        'activation_status' => 'Pending',
-                    ]);
-
-                    DB::commit();
-
-                    $this->dispatch('formSubmitted', [
-                        'icon' => 'success',
-                        'title' => 'Domain Registered successfully',
-                        'text' => $domainname,
-                        'html' => "<table class='table table-bordered'><tbody>
-                            <tr style='text-align:left'><td>Domain Name</td><td><strong>{$domainname}</strong></td></tr>
-                            <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
-                            </tbody>
-                            </table>
-                            <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
-                            <ul style='text-align:left'>
-                                <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
-                                <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
-                                <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
-                                <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
-                                <li>You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
-                            </ul>
-                            <p>Thank you for requesting domain name under GOV.IN.</p>"
-                    ]);
-
-
-                
-
-            } catch (\Exception $e) {
-
-                // Transaction automatically rolls back if an exception is thrown
-                // Handle or log the error as needed
-               //  throw $e; // or log the error if needed
-
-               DB::rollBack();
-               Log::error('Transaction failed: ' . $e->getMessage());
-               
-                $this->dispatch('formSubmitted', [
-                    'icon' => 'error',
-                    'type' => 'danger',
-                    'title' => 'Domain Registration failed',
-                    'text' => $e->getMessage(),
-                    'date' => date('Y-m-d'),
-                    'html' => "<p>{$e->getMessage()} There is some issue with registration. Please write to us at support@registry.gov.in</p>"
-                ]);
-            }
-           
+                        if(!empty($this->multipleip) && !$this->isChecked ){
+                            foreach($this->multipleip as $key => $val){
+                                DB::table('nameservers')->insert([
+                                    'hostname'          => $val['nshostname'],
+                                    'ipaddress' => serialize($val['ip']),
+                                ]);
+                            }
+                        }
     
-    }
+                    
+                        DB::commit();
+   
+                        $this->dispatch('formSubmitted', [
+                            'icon' => 'success',
+                            'title' => 'Domain Registered successfully',
+                            'text' => $domainname,
+                            'html' => "<table class='table table-bordered'><tbody>
+                                <tr style='text-align:left'><td>Domain Name</td><td><strong>{$domainname}</strong></td></tr>
+                                <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
+                                </tbody>
+                                </table>
+                                <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
+                                <ul style='text-align:left'>
+                                    <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
+                                    <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
+                                    <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
+                                    <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
+                                    <li>You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
+                                </ul>
+                                <p>Thank you for requesting domain name under GOV.IN.</p>"
+                        ]);
+
+
+                    
+
+                } catch (\Exception $e) {
+
+                    // Transaction automatically rolls back if an exception is thrown
+                    // Handle or log the error as needed
+                //  throw $e; // or log the error if needed
+
+                DB::rollBack();
+                Log::error('Transaction failed: ' . $e->getMessage());
+                
+                    $this->dispatch('formSubmitted', [
+                        'icon' => 'error',
+                        'type' => 'danger',
+                        'title' => 'Domain Registration failed',
+                        'text' => $e->getMessage(),
+                        'date' => date('Y-m-d'),
+                        'html' => "<p>{$e->getMessage()} There is some issue with registration. Please write to us at support@registry.gov.in</p>"
+                    ]);
+                }
+            
+        
+        }
 
         /** Multilevel Dropdown*/
 
@@ -626,7 +565,6 @@ class Registrationform extends Component
         public function updatedSelectedOrgcategory($orgCategory)
         {
 
-            // $this->resetErrorBag('selectedOrgcategory');
             $getorgcatRow= Orgcategory::where('orgcatid',$orgCategory)->first(); 
             $orgcat = ($getorgcatRow && $getorgcatRow->ministry_is_visible < 1)? $orgCategory : 0;       
             $this->ministries = Ministry::where('orgcatid','=',$orgcat)->get();
@@ -636,10 +574,7 @@ class Registrationform extends Component
             $this->selectedDepartment = null;
             $this->selectedOrganisation = null;
             $this->departments = [];
-            $this->organisations = [];
-           // $this->states = StateUt::all();
-          
-    
+            $this->organisations = [];    
         }
     
         public function updatedSelectedOrganisation($value)
@@ -650,40 +585,34 @@ class Registrationform extends Component
         }
         public function updatedSelectedMinistry($ministry)
         {
+            $this->addnewOrganisation = '';
+            $this->departments = Department::where('m_id','=',$ministry)->get();
+
            if($this->selectedOrgcategory == '6'){ // For orgcategory MUI, show only ministry
                 $this->selectedDepartment = 0;
                 $this->selectedOrganisation = 0;  
            }elseif($this->selectedOrgcategory == '4' || $this->selectedOrgcategory == '10' ){ // For orgcategory DUI , show only ministry and dept
                
-                $this->departments = Department::where('m_id','=',$ministry)->get();
+               // $this->departments = Department::where('m_id','=',$ministry)->get();
                 $this->customMsg = (!empty( $this->departments) && count($this->departments) > 0)
                                     ? ""
-                                    :'No department for this ministry please Either select another ministry Or Organization Category.' ;
-                // if($this->selectedOrgcategory == '10'){
-                //      $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
-                //      ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
-                // }
-           
+                                    :'No department for this ministry please Either select another ministry Or Organization Category.' ; 
+                $this->selectedDepartment = null;
+  
            }else{
 
-                $this->departments = Department::where('m_id','=',$ministry)->get();
+                // $this->departments = Department::where('m_id','=',$ministry)->get();
               
                 if(in_array($this->selectedOrgcategory,[1,2,3,5,7])){
                     $this->selectedDepartment = 0;
                     $this->departments = [];
                 } 
 
-                // if(!$this->isdepartmentVisible){
-                     $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
-                     ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
-                // } else{
-                //     $this->organisations = [];
-                //     $this->selectedOrganisation = null;
-                // }
-         
-          //dd($this->organisations);
-          //  $this->selectedDepartment = null;           
-         
+                $this->organisations = Organisation::where('m_id', '=', $this->selectedMinistry)
+                ->where('orgcat_id', '=', $this->selectedOrgcategory)->get();
+
+                $this->selectedOrganisation = null;
+                   
            }  
         }
 
