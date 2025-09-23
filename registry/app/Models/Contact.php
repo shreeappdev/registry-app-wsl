@@ -21,6 +21,7 @@ class Contact extends Model
             'countryid',
             'pincode',
             'telephone_std_code',
+            'country_dial_code',
             'telephone',
             'mobileno',
             'email'

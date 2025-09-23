@@ -5,7 +5,7 @@
     <form class="row needs-validation" method= "post" wire:submit.prevent="register" novalidate>
         @csrf
         @if ($currentStep == 1)
-        {{--@php $is_ministry_org = false; @endphp --}}
+        
             <div class="step-one">
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
@@ -242,33 +242,41 @@
                 </div>
             </div>
         @endif
-        @if ($currentStep == 2)
-            <div class="step-two">
+
+        @if(!empty($currentStep) && in_array($currentStep,[2,3,4]))
+            @php 
+                if($currentStep == 2){ $prefixStr = 'org'; } 
+                elseif($currentStep == 3){ $prefixStr = 'admin';} 
+                elseif($currentStep == 4){  $prefixStr = 'tech'; }
+                else{ $prefixStr=''; } 
+            @endphp
+
+            {{-- <div class="step-two"> --}}
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
-                        Step 2/6 (Organisational Contact)
+                        Step {{ $currentStep }}/6 ({{ $currentStep == 2 ? "Organisational" : ($currentStep == 3 ? 'Admin' : 'Technical') }} Contact)
                     </div>
                     <div class="card-body">
 
                         <div class="form-group row g-3">
                             <div class="col-md-6">
-                                <label for="orgName" class="form-label">Name</label>
-                                <input type="text" class="form-control @error('orgName') is-invalid @enderror"
-                                    placeholder="Enter name" wire:model.live="orgName">
+                                <label for="{{ $prefixStr}}Name" class="form-label">Name</label>
+                                <input type="text" id="{{ $prefixStr }}Name" class="form-control @error($prefixStr.'Name') is-invalid @enderror"
+                                    placeholder="Enter name" wire:model.live="{{$prefixStr.'Name'}}">
                                 <div class="invalid-feedback">
-                                    @error('orgName')
+                                    @error($prefixStr.'Name')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="inputorgDesignation" class="form-label">Designation</label>
-                                <input type="text"
-                                    class="form-control @error('orgDesignation') is-invalid @enderror"
-                                    placeholder="Enter designation" wire:model.live="orgDesignation">
+                                <label for="{{ $prefixStr }}.Designation" class="form-label">Designation</label>
+                                <input type="text" id="{{ $prefixStr }}Designation"
+                                    class="form-control  @error($prefixStr.'Designation') is-invalid @enderror"
+                                    placeholder="Enter designation" wire:model.live="{{$prefixStr.'Designation'}}">
 
                                 <div class="invalid-feedback">
-                                    @error('orgDesignation')
+                                    @error($prefixStr.'Designation')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -278,31 +286,32 @@
 
                         <div class="form-group row g-3">
                             <div class="col-md-6">
-                                <label for="orginputAddress1" class="form-label">Address</label>
-                                <input type="text" class="form-control @error('orgAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" placeholder="Enter Address" wire:model.live="orgAddress1">
+                                <label for="{{ $prefixStr}}inputAddress1" class="form-label">Address</label>
+                                <input type="text" id="{{ $prefixStr }}inputAddress1" class="form-control @error($prefixStr.'Address1') is-invalid @enderror"
+                                    placeholder="Enter Address" placeholder="Enter Address" wire:model.live="{{ $prefixStr}}Address1">
                                 <div class="invalid-feedback">
-                                    @error('orgAddress1')
+                                    @error($prefixStr.'Address1')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="orginputCity" class="form-label">City</label>
-                                <input type="text" class="form-control @error('orgCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model.live="orgCity">
+                                <label for="{{ $prefixStr}}inputCity" class="form-label">City</label>
+                                <input type="text" id = "{{ $prefixStr}}inputCity" class="form-control @error($prefixStr.'City') is-invalid @enderror"
+                                    placeholder="Enter City" wire:model.live="{{ $prefixStr}}City">
                                 <div class="invalid-feedback">
-                                    @error('orgCity')
+                                    @error($prefixStr.'City')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="form-group row g-3">
+                            @if( $selectedMinistry != 14)
                             <div class="col-md-6">
-                                <label for="orginputState" class="form-label">State</label>
-                                <select class="form-control @error('orgState') is-invalid @enderror"
-                                    wire:model.live="orgState">
+                                <label for="{{ $prefixStr}}inputState" class="form-label">State</label>
+                                <select id="{{ $prefixStr}}inputState" class="form-control  @error($prefixStr.'State') is-invalid @enderror"
+                                    wire:model.live="{{ $prefixStr}}State">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($states as $state)
                                         <option>{{ $state->state_utname }}</option>
@@ -310,18 +319,42 @@
                                 </select>
 
                                 <div class="invalid-feedback">
-                                    @error('orgState')
+                                    @error($prefixStr.'State')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label for="orginputPincode" class="form-label">Pincode</label>
-                                <input type="text" class="form-control @error('orgPincode') is-invalid @enderror"
-                                    placeholder="Enter Pincode" wire:model.live="orgPincode" minlength=6>
+                            @else
+                            <div class="col-md-3">
+                                <label for="{{ $prefixStr}}inputCountry" class="form-label">Country</label>
+                                <input type="text" id="{{$prefixStr}}inputCountry" class="form-control @error($prefixStr.'Country') is-invalid @enderror"
+                                    placeholder="Enter Country" wire:model.live="{{$prefixStr}}Country" minlength=6>
 
                                 <div class="invalid-feedback">
-                                    @error('orgPincode')
+                                    @error($prefixStr.'Country')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ $prefixStr}}inputState" class="form-label">State</label>
+                                <input type="text" id="{{$prefixStr}}inputState" class="form-control @error($prefixStr.'State') is-invalid @enderror"
+                                    placeholder="Enter State" wire:model.live="{{$prefixStr}}State">
+
+                                <div class="invalid-feedback">
+                                    @error($prefixStr.'State')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
+                            </div>
+                            @endif
+                            <div class="col-md-6">
+                                <label for="{{$prefixStr}}inputPincode" class="form-label">Pincode</label>
+                                <input type="text" id="{{$prefixStr}}inputPincode" class="form-control @error($prefixStr.'Pincode') is-invalid @enderror"
+                                    placeholder="Enter Pincode" wire:model.live="{{$prefixStr}}Pincode" minlength=6>
+
+                                <div class="invalid-feedback">
+                                    @error($prefixStr.'Pincode')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -329,14 +362,12 @@
                         </div>
                         <div class="form-group row g-3">
 
-                            <label for="orgStdCode" class="form-label">Telephone</label>
-                             
-
+                            <label for="{{ $prefixStr}}StdCode" class="form-label">Telephone</label>
                                     <div class="col-md-2">
-                                        <label for="orgcountrydialcode" class="visually-hidden">Country Code</label>
-                                        <input type="text" id="orgcountrydialcode" class="form-control @error('orgcountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model.live="orgcountrydialcode" aria-describedby="orgcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
+                                        <label for="{{ $prefixStr}}countrydialcode" class="visually-hidden">Country Code</label>
+                                        <input type="text" id="{{ $prefixStr}}countrydialcode" class="form-control @error($prefixStr.'CountryDialCode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model.defer="{{ $prefixStr}}CountryDialCode" aria-describedby="{{ $prefixStr}}CountryDialCode }}" {{ $selectedMinistry != 14 ? 'disabled':''}}>
                                         <div class="invalid-feedback">
-                                            @error('orgcountrydialcode')
+                                            @error($prefixStr.'CountryDialCode')
                                                 {{ $message }}
                                             @enderror
                                         </div>
@@ -344,26 +375,26 @@
                               
                             
                             <div class="col-md-2">
-                                <label for="stdCode" class="visually-hidden">Std Code</label>
-                                <input type="text" class="form-control @error('orgStdCode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model.live="orgStdCode" aria-describedby="stdcode"
+                                <label for="{{$prefixStr}}stdCode" class="visually-hidden">Std Code</label>
+                                <input type="text" id="{{$prefixStr}}stdCode" class="form-control @error($prefixStr.'StdCode') is-invalid @enderror"
+                                    placeholder="STD Code" wire:model.live="{{ $prefixStr}}StdCode" aria-describedby="stdcode"
                                     maxlength=4 minlength=2>
 
                                     
                                 <div class="invalid-feedback">
-                                    @error('orgStdCode')
+                                    @error($prefixStr.'StdCode')
                                         {{ $message }}
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="inputPassword2" class="visually-hidden">Number</label>
-                                <input type="text"
-                                    class="form-control @error('orgTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" placeholder="Telephone Number" wire:model.live="orgTelehponeNo">
+                                <label for="{{$prefixStr}}telnumber" class="visually-hidden">Number</label>
+                                <input type="text" id="{{$prefixStr}}telnumber"
+                                    class="form-control @error($prefixStr.'TelephoneNo') is-invalid @enderror" maxlength=10
+                                    minlength=4 aria-describedby="telnumber" placeholder="Telephone Number" wire:model.live="{{ $prefixStr}}TelephoneNo">
 
                                 <div class="invalid-feedback">
-                                    @error('orgTelehponeNo')
+                                    @error($prefixStr.'TelephoneNo')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -372,11 +403,11 @@
 
                         <div class="form-group row g-3">
                             <div class="col-md-4">
-                                <label for="orginputMobile" class="form-label">Mobile No</label>
-                                <input type="text" class="form-control @error('orgMobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" minlength=10 wire:model.live="orgMobileNo">
+                                <label for="{{ $prefixStr}}inputMobile" class="form-label">Mobile No</label>
+                                <input type="text" id="{{ $prefixStr}}inputMobile" class="form-control @error($prefixStr.'MobileNo') is-invalid @enderror"
+                                    placeholder="Enter Mobile No" minlength=10 wire:model.live="{{ $prefixStr}}MobileNo">
                                 <div class="invalid-feedback">
-                                    @error('orgMobileNo')
+                                    @error($prefixStr.'MobileNo')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -384,171 +415,18 @@
 
 
                             <div class="col-md-6">
-                                <label for="orginputEmail" class="form-label">Email Id</label>
-                                <input type="text" class="form-control @error('orgEmailId') is-invalid @enderror"
-                                    placeholder="Enter Email" wire:model.live="orgEmailId">
-                                <div class="invalid-feedback">
-                                    @error('orgEmailId')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-        @if ($currentStep == 3)
-            <div class="step-three">
-                <div class="card">
-                    <div class="card-header bg-primary text-white shadow">
-                        Step 3/6 (Administrative Contact)
-                    </div>
-                    <div class="card-body">
-
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="adminName" class="form-label">Name</label>
-                                <input type="text" class="form-control @error('adminName') is-invalid @enderror"
-                                    placeholder="Enter Name" wire:model.live="adminName">
-
-                                <div class="invalid-feedback">
-                                    @error('adminName')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="adminDesignation" class="form-label">Designation</label>
-                                <input type="text"
-                                    class="form-control  @error('adminDesignation') is-invalid @enderror"
-                                    placeholder="Enter Designation" wire:model.live="adminDesignation">
-                                <div class="invalid-feedback">
-                                    @error('adminDesignation')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="admininputAddress" class="form-label">Address</label>
-                                <input type="text"
-                                    class="form-control  @error('adminAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" wire:model.live="adminAddress1">
-                                <div class="invalid-feedback">
-                                    @error('adminAddress1')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-
-
-                            <div class="col-md-6">
-                                <label for="admininputCity" class="form-label">City</label>
-                                <input type="text" class="form-control @error('adminCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model.live="adminCity">
-                                <div class="invalid-feedback">
-                                    @error('adminCity')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="admininputState" class="form-label">State</label>
-                                <select class="form-control @error('adminState') is-invalid @enderror"
-                                    wire:model.live="adminState">
-                                    <option value="" selected>Choose...</option>
-                                    @foreach ($states as $state)
-                                        <option>{{ $state->state_utname }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">
-                                    @error('adminState')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="admininputPincode" class="form-label">Pincode</label>
-                                <input type="text"
-                                    class="form-control @error('adminPincode') is-invalid @enderror"
-                                    placeholder="Enter Pincode" wire:model.live="adminPincode" minlength=6>
-                                <div class="invalid-feedback">
-                                    @error('adminPincode')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row g-3">
-
-                            
-                            <label for="adminStdCode" class="form-label">Telephone</label>
-
-                                <div class="col-md-2">
-                                    <label for="adminStdCode" class="visually-hidden">Country Code</label>
-                                    <input type="text" id="adminStdCode" class="form-control @error('admincountrydialcode') is-invalid @enderror" placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}"  wire:model.live="admincountrydialcode" aria-describedby="admincountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
-
-                                    <div class="invalid-feedback">
-                                        @error('admincountrydialcode')
-                                            {{ $message }}
-                                        @enderror
+                                <label for="{{ $prefixStr}}inputEmail" class="form-label">Email Id</label>
+                                <input type="text" id="{{ $prefixStr}}inputEmail" class="form-control @error($prefixStr.'EmailId') is-invalid @enderror"
+                                    placeholder="Enter Email" wire:model.live="{{ $prefixStr }}EmailId">
+                               
+                                @if ( $currentStep == 3 && $customMsg) 
+                                    <div class="invalid-feedback d-block">
+                                        {{ $customMsg }}
                                     </div>
-                                </div>
-                              
-                            <div class="col-md-2">
-                                <label for="stdCode" class="visually-hidden">Std Code</label>
-                                <input type="text"
-                                    class="form-control @error('adminStdCode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model.live="adminStdCode" aria-describedby="stdcode"
-                                    maxlength=4 minlength=2>
-                                <div class="invalid-feedback">
-                                    @error('adminStdCode')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="inputPassword2" class="visually-hidden">Number</label>
-                                <input type="text"
-                                    class="form-control @error('adminTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" wire:model.live="adminTelehponeNo">
+                                @endif
 
                                 <div class="invalid-feedback">
-                                    @error('adminTelehponeNo')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="admininputMobile" class="form-label">Mobile No</label>
-                                <input type="text"
-                                    class="form-control @error('adminMobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" minlength=10 wire:model.live="adminMobileNo">
-                                <div class="invalid-feedback">
-                                    @error('adminMobileNo')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-
-
-                            <div class="col-md-6">
-                                <label for="admininputEmail" class="form-label">Email Id</label>
-                                <input type="text"
-                                    class="form-control @error('adminEmailId') is-invalid @enderror"
-                                    placeholder="Enter Email Id" wire:model.live="adminEmailId">
-                                <div class="invalid-feedback">
-                                    @error('adminEmailId')
+                                    @error($prefixStr.'EmailId')
                                         {{ $message }}
                                     @enderror
                                 </div>
@@ -556,159 +434,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
-        @if ($currentStep == 4)
-            <div class="step-four">
-                <div class="card">
-                    <div class="card-header bg-primary text-white shadow">
-                        Step 4/6 (Technical Contact)
-                    </div>
-                    <div class="card-body">
+            {{-- </div> --}}
 
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="orgName" class="form-label">Name</label>
-                                <input type="text" class="form-control @error('techName') is-invalid @enderror"
-                                    placeholder="Enter Name" wire:model.live="techName">
-                                <div class="invalid-feedback">
-                                    @error('techName')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="techDesignation" class="form-label">Designation</label>
-                                <input type="text"
-                                    class="form-control @error('techDesignation') is-invalid @enderror"
-                                    placeholder="Enter Designation" wire:model.live="techDesignation">
-                                <div class="invalid-feedback">
-                                    @error('techDesignation')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="techinputAddress" class="form-label">Address</label>
-                                <input type="text"
-                                    class="form-control @error('techAddress1') is-invalid @enderror"
-                                    placeholder="Enter Address" wire:model.live="techAddress1">
-                                <div class="invalid-feedback">
-                                    @error('techAddress1')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="techinputCity" class="form-label">City</label>
-                                <input type="text" class="form-control @error('techCity') is-invalid @enderror"
-                                    placeholder="Enter City" wire:model.live="techCity">
-                                <div class="invalid-feedback">
-                                    @error('techCity')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="techinputState" class="form-label">State</label>
-                                <select class="form-control @error('techState') is-invalid @enderror"
-                                    wire:model.live="techState">
-                                    <option value="" selected>Choose...</option>
-                                    @foreach ($states as $state)
-                                        <option>{{ $state->state_utname }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">
-                                    @error('techState')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="techinputPincode" class="form-label">Pincode</label>
-                                <input type="text" class="form-control @error('techPincode') is-invalid @enderror"
-                                    wire:model.live="techPincode" placeholder="Enter Pincode" minlength=6>
-                                <div class="invalid-feedback">
-                                    @error('techPincode')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row g-3">
-                            <label for="techStdCode" class="form-label">Telephone</label>
-
-                            <div class="col-md-2">
-                                    <label for="techcountrydialcode" class="visually-hidden">Country Code</label>
-                                    <input type="text" id="techStdCode" class="form-control @error('techcountrydialcode') is-invalid @enderror"  placeholder="{{ $selectedMinistry != 14 ? '+91':'Country Code'}}" wire:model.live="techcountrydialcode" aria-describedby="techcountrydialcode" {{ $selectedMinistry != 14 ? 'disabled':''}}>
-                                       
-                                    <div class="invalid-feedback">
-                                        @error('techcountrydialcode')
-                                            {{ $message }}
-                                        @enderror
-                                    </div>
-                                </div>
-                            <div class="col-md-2">
-                                <label for="stdCode" class="visually-hidden">Std Code</label>
-                                <input type="text" class="form-control @error('techStdCode') is-invalid @enderror"
-                                    placeholder="STD Code" wire:model.live="techStdCode" aria-describedby="stdcode"
-                                    maxlength=4 minlength=2>
-                                <div class="invalid-feedback">
-                                    @error('techStdCode')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="inputPassword2" class="visually-hidden">Number</label>
-                                <input type="text"
-                                    class="form-control @error('techTelehponeNo') is-invalid @enderror" maxlength=10
-                                    minlength=4 aria-describedby="telnumber" wire:model.live="techTelehponeNo">
-
-                                <div class="invalid-feedback">
-                                    @error('techTelehponeNo')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row g-3">
-                            <div class="col-md-6">
-                                <label for="techinputMobile" class="form-label">Mobile No</label>
-                                <input type="text"
-                                    class="form-control @error('techMobileNo') is-invalid @enderror"
-                                    placeholder="Enter Mobile No" wire:model.live="techMobileNo" minlength=10>
-                                <div class="invalid-feedback">
-                                    @error('techMobileNo')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="techinputEmail" class="form-label">Email Id</label>
-                                <input type="text"
-                                    class="form-control  @error('techEmailId') is-invalid @enderror"
-                                    placeholder="Enter Email Id" wire:model.live="techEmailId">
-                                <div class="invalid-feedback">
-                                    @error('techEmailId')
-                                        {{ $message }}
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
+        @endif        
+                 
         @if ($currentStep == 5)
             <div class="col-lg-12 step-four">
                 <div class="card">

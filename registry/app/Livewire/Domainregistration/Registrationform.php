@@ -59,11 +59,12 @@ class Registrationform extends Component
     public $orgCity;
     public $orgState;
     public $orgPincode;
-    public $orgTelehponeNo;
+    public $orgTelephoneNo;
     public $orgStdCode;
     public $orgMobileNo;
     public $orgEmailId;
-    public $orgcountrydialcode;
+    public $orgCountryDialCode;
+    public $orgCountry;
 
     /** Third step */
    
@@ -74,11 +75,13 @@ class Registrationform extends Component
     public $adminCity;
     public $adminState;
     public $adminPincode;
-    public $adminTelehponeNo;
+    public $adminTelephoneNo;
     public $adminStdCode;
     public $adminMobileNo;
     public $adminEmailId;
-    public $admincountrydialcode;
+    public $adminCountryDialCode;
+    public $adminCountry;
+
 
     /** Fourth step */
 
@@ -89,11 +92,13 @@ class Registrationform extends Component
     public $techCity;
     public $techState;
     public $techPincode;
-    public $techTelehponeNo;
+    public $techTelephoneNo;
     public $techStdCode;
     public $techMobileNo;
     public $techEmailId;
-    public $techcountrydialcode;
+    public $techCountryDialCode;
+    public $techCountry;
+
 
 
     public $isChecked=true;
@@ -120,9 +125,7 @@ class Registrationform extends Component
         }
 
         public function increaseStep(){    
-            //                             $ext = IdnLanguage::where('lang_code',$this->language_code)->first();
-
-             
+           
             $this->resetErrorBag();
             $this->validateData();
             $this->currentStep++;
@@ -130,6 +133,8 @@ class Registrationform extends Component
             if($this->currentStep > $this->totalStep){
                 $this->currentStep = $this->totalStep;
             }
+
+            
         }
 
         public function decreaseStep(){
@@ -211,25 +216,31 @@ class Registrationform extends Component
 
         private function rules($prefixStr)
         {
-            return [
+            
+            $rules =  [
                 $prefixStr.'Name'=>['required','max:200','regex:/^[a-zA-Z\s]+$/'],
                 $prefixStr.'Designation'=>['required','regex:/^[a-zA-Z\s]+$/'],
                 $prefixStr.'MobileNo'=>['required','regex:/^[1-9][0-9]{9}$/'],
                 $prefixStr.'EmailId'=>['required','regex:/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.)?(nic|gov)\.in$/'],
                 $prefixStr.'City'=>['required','regex:/^[a-zA-Z\s]+$/'],
-                $prefixStr.'State'=>'required',
+                $prefixStr.'State'=>'required|regex:/^[a-zA-Z\s]+$/',
                 $prefixStr.'Pincode' => ['required','digits:6'],
-                $prefixStr.'TelehponeNo'=>'required|regex:/^[0-9]{4,8}+$/',
+                $prefixStr.'TelephoneNo'=>'required|regex:/^[0-9]{4,8}+$/',
                 $prefixStr.'StdCode'=>'required|regex:/^[0-9]{2,4}+$/',
                 $prefixStr.'Address1' => ['required','string','min:5','max:255','regex:/^(?!\d+$)[A-Za-z0-9\s,.\-#]+$/' ],
-
-
+                $prefixStr.'CountryDialCode' => 'nullable|required_if:selectedMinistry,14|numeric|min:1|max:9999',
+                $prefixStr.'Country' => 'nullable|required_if:selectedMinistry,14|regex:/^[a-zA-Z\s]+$/',
             ];
+
+            if ($prefixStr === 'admin') {
+                $rules['adminEmailId'][] = 'different:orgEmailId';
+            }
+             return $rules;
         }
 
         private function messages($prefixStr)
         {
-            return [
+            $messages =  [
                 $prefixStr.'Name.required' => 'Name is required',
                 $prefixStr.'Name.regex'=>'Only character and space is allowed',
                 $prefixStr.'City.required' => 'City is required',
@@ -246,14 +257,24 @@ class Registrationform extends Component
                 $prefixStr.'Designation.regex'=>'Only character and space is allowed',
                 $prefixStr.'EmailId.required' =>'Email id is required',
                 $prefixStr.'EmailId.regex'=>'Email id will be @nic.in or @gov.in',
-                $prefixStr.'TelehponeNo.required' => 'Telephone No is required',
-                $prefixStr.'TelehponeNo.regex'=>'Telephone No should be minimum 4 digits and maximum 8 digits',
+                $prefixStr.'TelephoneNo.required' => 'Telephone No is required',
+                $prefixStr.'TelephoneNo.regex'=>'Telephone No should be minimum 4 digits and maximum 8 digits',
                 $prefixStr.'StdCode.required'=>'Please enter STD code',
                 $prefixStr.'StdCode.regex'=>'STD code should be minimum 2 digits and maximum 4 digits',
                 $prefixStr.'MobileNo.required' =>'Mobile No is required',
                 $prefixStr.'MobileNo.regex'=>'The mobile number must be 10 digits and should not start with 0',
-                
+                $prefixStr.'CountryDialCode.required_if'=>'CountryDialCode is required.',
+                $prefixStr.'Country.required_if'=>'Country is required.',
+                $prefixStr.'Country.regex'=>'Only character and space is allowed',
+                $prefixStr.'State.regex'=>'Only character and space is allowed',
+               
             ];
+
+            if ($prefixStr == 'admin') {
+                $messages['adminEmailId.different'] = 'Organisational and Admin , EmailId can not be same.';
+            }
+             
+            return $messages;
         }  
 
         
@@ -339,10 +360,6 @@ class Registrationform extends Component
 
                         DB::beginTransaction();
 
-                     
-                        
-
-//dd($this->adminStdCode,$this->orgStdCode,$this->techStdCode);
                         $extension = '.gov.in'; // default
 
                         if ($this->language_code !== 'en') {
@@ -421,15 +438,16 @@ class Registrationform extends Component
                                 'address2' => $this->orgAddress2,
                                 'city' => $this->orgCity,
                                 'state' => $this->orgState,
-                                'countryid' => 'India',
+                                'countryid' => $this->orgCountry??'India',
                                 'pincode' => $this->orgPincode,
                                 'telephone_std_code' => $this->orgStdCode,
-                                'telephone' => $this->orgTelehponeNo,
+                                'telephone' => $this->orgTelephoneNo,
                                 'mobileno' => $this->orgMobileNo,
                                 'email' => $this->orgEmailId,
+                                'country_dial_code' => $this->orgCountryDialCode ?? 91
                             ]);
 
-                            
+                       //  dd('org', $this->orgState,$this->orgCountry,$this->orgCountryDialCode,'tech',$this->techState,$this->techCountry,'admin',$this->adminState,$this->adminCountry);  
                         //insert in Admin contacts
             
                         Contact::create([
@@ -440,12 +458,13 @@ class Registrationform extends Component
                             'address2' => $this->adminAddress2,
                             'city' => $this->adminCity,
                             'state' => $this->adminState,
-                            'countryid' => 'India',
+                            'countryid' => $this->adminCountry??'India',
                             'pincode' => $this->adminPincode,
                             'telephone_std_code' => $this->adminStdCode,
-                            'telephone' => $this->adminTelehponeNo,
+                            'telephone' => $this->adminTelephoneNo,
                             'mobileno' => $this->adminMobileNo,                    
-                            'email' => $this->adminEmailId
+                            'email' => $this->adminEmailId,
+                            'country_dial_code' => $this->adminCountryDialCode ?? 91
                         ]);
 
                         //insert in Technical contacts
@@ -457,12 +476,14 @@ class Registrationform extends Component
                                 'address2' => $this->techAddress2,
                                 'city' => $this->techCity,
                                 'state' => $this->techState,
-                                'countryid' => 'India',
+                                'countryid' => $this->techCountry??'India',
                                 'pincode' => $this->techPincode,
                                 'telephone_std_code' => $this->techStdCode,
-                                'telephone' => $this->techTelehponeNo,
+                                'telephone' => $this->techTelephoneNo,
                                 'mobileno' => $this->techMobileNo,
                                 'email' => $this->techEmailId,
+                                'country_dial_code' => $this->techCountryDialCode ?? 91
+
                         ]);
 
                         /** Nameserver Data */
