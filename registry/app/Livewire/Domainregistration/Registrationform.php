@@ -18,12 +18,15 @@ use Livewire\Attributes\Title;
 use App\Models\Nameserver_data;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use App\Rules\SelectedDepartmentRequired;
+use App\Models\DomainRegistraionMultiStep;
 
 class Registrationform extends Component
 {
 
 
+    public $userId = 1;
     /** First step */
     public $showAlert = false;
     public $language_code;
@@ -122,14 +125,57 @@ class Registrationform extends Component
                                 ];
             $this->isaddOrganisation = false;
             $this->isdepartmentVisible = false;
+
+            $draft = DomainRegistraionMultiStep::where('userid', $this->userId)
+                ->where('form_id', 1)
+                ->first();
+
+            if ($draft) {
+                foreach (json_decode($draft->formdata, true) as $field => $value) {
+                    if (property_exists($this, $field)) {
+                        $this->$field = $value;
+                    }
+                }
+                $this->currentStep = $draft->formlevel ?? 1;
+                $this->orgCategories = Cache::get("orgCategories_{$this->userId}", []);
+                $this->ministries = Cache::get("ministries_{$this->userId}", []);
+                $this->departments = Cache::get("departments_{$this->userId}", []);
+                $this->organisations = Cache::get("organisations_{$this->userId}", []);
+            }
+           
+            
+
+
+            // Fetch orgCategories based on the prefilled region
+           // if (!empty($this->region)) {
+                // $this->orgCategories = Orgcategory::where('region', $this->region)->where('is_active', 1)->get();
+            //}
         }
 
+
         public function increaseStep(){    
-           
+         //  dd($this->domainname);
             $this->resetErrorBag();
             $this->validateData();
+
+            // Decide prefix string based on step
+            $prefixStr = null;
+            if (in_array($this->currentStep, [2, 3, 4])) {
+                if ($this->currentStep == 2) {
+                    $prefixStr = 'org';
+                } elseif ($this->currentStep == 3) {
+                    $prefixStr = 'admin';
+                } elseif ($this->currentStep == 4) {
+                    $prefixStr = 'tech';
+                }
+            }
+
+            // Validate + save draft
+            $this->saveDraft($prefixStr);
+
             $this->currentStep++;
-    
+
+   
             if($this->currentStep > $this->totalStep){
                 $this->currentStep = $this->totalStep;
             }
@@ -149,7 +195,7 @@ class Registrationform extends Component
         {
             return [
                 'region' => 'required',
-                'domainname' => 'required',//['required', new DomainRule()],
+                'domainname' => ['required','regex:/^(?!-)(?!.*\s)[\p{L}\p{M}\p{N}-]+(?<!-)$/u'],
                 'language_code' => 'required',
                 'hindidomainname'=>'required_if:language_code,en',
                 'selectedOrgcategory' => 'required',
@@ -172,6 +218,7 @@ class Registrationform extends Component
                 'region.required' => 'Please select region.',
                 'language_code.required' => 'Please select language.',
                 'domainname.required' => 'Domain name is required.',
+                'domainname.regex' => 'Domain name may only contain letters, numbers, and hyphens, cannot start or end with a hyphen, and must not contain spaces.',
                 'hindidomainname.required_if' => 'Hindi Domain name is required.',
                 'selectedMinistry.required_if' => 'Please select ministry when region is Central.',
                 'selectedOrgcategory.required' => 'Organisation Category is required.',
@@ -491,7 +538,7 @@ class Registrationform extends Component
                                 'domainid' => $domainid,
                                 'current_data_sets' => serialize($this->multipleip),
                                 'activation_status' => 'Pending',
-                            ]);
+                        ]);
 
                         if(!empty($this->multipleip) && !$this->isChecked ){
                             foreach($this->multipleip as $key => $val){
@@ -501,9 +548,12 @@ class Registrationform extends Component
                                 ]);
                             }
                         }
-    
-                    
+                       
                         DB::commit();
+
+                        DomainRegistraionMultiStep::where('userid', 1)
+                                                    ->where('form_id', 1)
+                                                    ->delete();
    
                         $this->dispatch('formSubmitted', [
                             'icon' => 'success',
@@ -524,9 +574,7 @@ class Registrationform extends Component
                                 </ul>
                                 <p>Thank you for requesting domain name under GOV.IN.</p>"
                         ]);
-
-
-                    
+                   
 
                 } catch (\Exception $e) {
 
@@ -549,6 +597,52 @@ class Registrationform extends Component
             
         
         }
+
+        public function saveDraft($prefixStr = null)
+        {
+            // Collect only validated step data
+            if ($this->currentStep == 1) {
+                $formData = $this->validate($this->rulesForStep1(), $this->messagesForStep1());
+            } elseif (in_array($this->currentStep, [2,3,4])) {
+                $formData = $this->validate($this->rules($prefixStr), $this->messages($prefixStr));
+            } elseif ($this->currentStep == 5 && !$this->isChecked) {
+                $formData = $this->validate($this->rulesForStep5(), $this->messagesForStep5());
+            } else {
+                $formData = [];
+            }
+
+            // Save draft
+            DomainRegistraionMultiStep::updateOrCreate(
+                [
+                    'userid'  => $this->userId,
+                    'form_id' => 1,
+                ],
+                [
+                    'formdata'  => json_encode(array_merge(
+                        $this->getDraftData(), // keep old saved steps
+                        $formData              // merge current step
+                    )),
+                    'formlevel' => $this->currentStep,
+                ]
+            );
+
+            Cache::put("orgCategories_{$this->userId}", $this->orgCategories);
+            Cache::put("ministries_{$this->userId}", $this->ministries);
+            Cache::put("departments_{$this->userId}", $this->departments);
+            Cache::put("organisations_{$this->userId}", $this->organisations);
+
+           
+        }
+
+        protected function getDraftData()
+        {
+            $draft = DomainRegistraionMultiStep::where('userid', 1)
+                        ->where('form_id', 1)
+                        ->first();
+
+            return $draft ? json_decode($draft->formdata, true) : [];
+        }
+
 
         /** Multilevel Dropdown*/
 

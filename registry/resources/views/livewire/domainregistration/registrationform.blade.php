@@ -86,6 +86,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            
                             @if(!empty($orgCategories) && count($orgCategories) > 0)
                             <div class="col-md-9">
                                 <label for="orgCategory" class="form-label">Select Organization Category</label>
@@ -93,15 +94,6 @@
                                     wire:model.live="selectedOrgcategory">
                                     <option value="" selected>Choose...</option>
                                     @foreach ($orgCategories as $key => $orgcategory)
-
-                                       {{-- 
-                                       @if( $orgcategory->orgcatid == "6")
-
-                                           @php $is_ministry_org = true;   @endphp
-                                        @else
-                                           @php $is_ministry_org = false; @endphp
-                                        @endif
-                                       --}} 
 
                                         <option value="{{ $orgcategory->orgcatid }}"
                                             data-deptVisible="{{ $orgcategory->dept_is_visible }}"
@@ -126,15 +118,11 @@
                             <div class="col-md-6">
                                 <label for="ministry" class="form-label">Select Ministry</label>
                                 <select id="ministry" class="form-control @error('selectedMinistry') is-invalid @enderror"
-                                    wire:model.live="selectedMinistry">
-                                    @if (count($ministries) < 1)
-                                        <option value="" selected>No data</option>
-                                    @else
+                                    wire:model.live="selectedMinistry">                                   
                                         <option>Choose...</option>
                                         @foreach ($ministries as $key => $min)
                                             <option value="{{ $min->m_id }}">{{ $min->m_name }}</option>
-                                        @endforeach
-                                    @endif
+                                        @endforeach                                    
                                 </select>
                                 @if ($customMsg) 
                                     <div class="invalid-feedback d-block">
@@ -618,8 +606,8 @@
          * Force Livewire to sync input values
          * (PramukhIME does not trigger native input events)
          */
-        $(document).on('keyup change', '#domainname, #hindidomainname', function () {
-            this.dispatchEvent(new Event('input', { bubbles: true }));
+        $(document).on('input keyup change compositionend', '#domainname, #hindidomainname', function () {
+           this.dispatchEvent(new Event('input', { bubbles: true }));
         });
 
         // keyboard cl
