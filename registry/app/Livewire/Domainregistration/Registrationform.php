@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use App\Rules\SelectedDepartmentRequired;
 use App\Models\DomainRegistraionMultiStep;
+use App\Mail\SendMail;
+use Illuminate\Support\Facades\Mail;
 
 class Registrationform extends Component
 {
@@ -153,7 +155,29 @@ class Registrationform extends Component
         }
 
 
-        public function increaseStep(){    
+        public function increaseStep(){ 
+            
+            $this->dispatch('formSubmitted', [
+                            'icon' => 'success',
+                            'title' => 'Domain Registered successfully',
+                            'text' => 'gfdgdf',
+                            'html' => "<table class='table table-bordered'><tbody>
+                                <tr style='text-align:left'><td>Domain Name</td><td><strong></strong></td></tr>
+                                <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
+                                </tbody>
+                                </table>
+                                <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
+                                <ul style='text-align:left'>
+                                    <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
+                                    <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
+                                    <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
+                                    <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
+                                    <li>You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
+                                </ul>
+                                <p>Thank you for requesting domain name under GOV.IN.</p>"
+                        ]);
+
+
          //  dd($this->domainname);
             $this->resetErrorBag();
             $this->validateData();
@@ -197,7 +221,6 @@ class Registrationform extends Component
                 'region' => 'required',
                 'domainname' => ['required','regex:/^(?!-)(?!.*\s)[\p{L}\p{M}\p{N}-]+(?<!-)$/u'],
                 'language_code' => 'required',
-                'hindidomainname'=>'required_if:language_code,en',
                 'selectedOrgcategory' => 'required',
                 'selectedOrganisation' => 'required_if:addnewOrganisation,""',
                 'selectedState' => 'required_if:region,2',
@@ -208,6 +231,11 @@ class Registrationform extends Component
                                             'regex:/^[a-zA-Z\s]+$/',
                                             'required_without:selectedOrganisation',
                                         ],
+                'hindidomainname'=> [
+                                        'nullable',
+                                        'required_if:language_code,en',
+                                        'regex:/^(?!-)(?!.*\s)[\p{L}\p{M}\p{N}-]+(?<!-)$/u',
+                                    ],
 
             ];
         }
@@ -220,6 +248,7 @@ class Registrationform extends Component
                 'domainname.required' => 'Domain name is required.',
                 'domainname.regex' => 'Domain name may only contain letters, numbers, and hyphens, cannot start or end with a hyphen, and must not contain spaces.',
                 'hindidomainname.required_if' => 'Hindi Domain name is required.',
+                'hindidomainname.regex' => 'Domain name may only contain letters, numbers, and hyphens, cannot start or end with a hyphen, and must not contain spaces.',
                 'selectedMinistry.required_if' => 'Please select ministry when region is Central.',
                 'selectedOrgcategory.required' => 'Organisation Category is required.',
                 'selectedOrganisation.required_if' => 'Organisation is required.',
@@ -318,7 +347,7 @@ class Registrationform extends Component
             ];
 
             if ($prefixStr == 'admin') {
-                $messages['adminEmailId.different'] = 'Organisational and Admin , EmailId can not be same.';
+                $messages['adminEmailId.different'] = 'Organizational and administrative contact person should not have same email id';
             }
              
             return $messages;
@@ -550,11 +579,31 @@ class Registrationform extends Component
                         }
                        
                         DB::commit();
-
                         DomainRegistraionMultiStep::where('userid', 1)
                                                     ->where('form_id', 1)
                                                     ->delete();
-   
+                        
+                                    
+                        $body = "You have successfully submitted your request for the Domain Name - <strong> $fullDomain </strong><br>
+                                <p>The Requested Details are:</p>
+                                <p>
+                                Domain:<strong> $fullDomain</strong><br>
+                                Requested on:".date('d-m-Y')."<br>
+                                Domain Status:Pending - Waiting for Authorization & Forwarding Letter </strong></p>General Instructions:<ol>
+                                <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format</li>
+
+                                <li>GOV.IN domain registry will contact you in case of further clarification on your registered email id(s).</li>
+                                <li>You may see the status of your domain registration request online at our registry website under your login account.</li>
+                                <li>You may seek assistance lodge complain through our servicedesk- http://servicedesk.nic.in/ or may call on Toll Free No- 1800 111 555. Please note that domain name is essential for getting service through service desk.</li>
+                                </ol>
+                                <p><i><strong>Please note that domain name is essential for getting service through service desk.</strong></i></p>";
+                            
+                        $mail_subject = "Registration Request Submitted For Domain Name:$fullDomain";
+
+                        Mail::to(['dev-webtech@govcontractor.in',$this->techEmailId,$this->adminEmailId,$this->orgEmailId])->send(
+                                new SendMail( $body, $mail_subject)
+                              );
+                          
                         $this->dispatch('formSubmitted', [
                             'icon' => 'success',
                             'title' => 'Domain Registered successfully',

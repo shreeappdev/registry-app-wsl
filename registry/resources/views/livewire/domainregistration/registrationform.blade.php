@@ -9,7 +9,7 @@
             <div class="step-one">
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
-                        Step 1/6  Domain Details
+                        Step 1/5  Domain Details
                     </div>
                     <div class="card-body">
 
@@ -242,7 +242,7 @@
             {{-- <div class="step-two"> --}}
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
-                        Step {{ $currentStep }}/6 ({{ $currentStep == 2 ? "Organisational" : ($currentStep == 3 ? 'Admin' : 'Technical') }} Contact)
+                        Step {{ $currentStep }}/5 ({{ $currentStep == 2 ? "Organisational" : ($currentStep == 3 ? 'Admin' : 'Technical') }} Contact)
                     </div>
                     <div class="card-body">
 
@@ -430,7 +430,7 @@
             <div class="col-lg-12 step-four">
                 <div class="card">
                     <div class="card-header bg-primary text-white shadow">
-                        Step 5/6 (Nameserver Details)
+                        Step 5/5 (Nameserver Details)
                     </div>
                     <div class="card-body">
                         <div class="card-body row g-3">
@@ -559,6 +559,7 @@
     <script>
         window.addEventListener('formSubmitted', (event) => {
             let data = event.detail;
+            console.log('dfdfata',data, data.html);
             Swal.fire({
                 position: 'center',
                 width: 800,
