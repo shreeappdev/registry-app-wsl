@@ -558,7 +558,7 @@
 <script src="{{ asset('js/pramukhindic.js') }}"></script>
     <script>
         window.addEventListener('formSubmitted', (event) => {
-            let data = event.detail;
+            let data = event.detail[0];
             console.log('dfdfata',data, data.html);
             Swal.fire({
                 position: 'center',
@@ -570,7 +570,7 @@
                 timer: null,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                footer: '<a href="/user/domainregistration">Back to Dashboard</a>'
+                footer: '<a href="/user/generateletter">Generate letter to activate the Domain</a>'
 
             }); // Show alert with the message
         });

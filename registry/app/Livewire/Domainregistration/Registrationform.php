@@ -155,30 +155,8 @@ class Registrationform extends Component
         }
 
 
-        public function increaseStep(){ 
-            
-            $this->dispatch('formSubmitted', [
-                            'icon' => 'success',
-                            'title' => 'Domain Registered successfully',
-                            'text' => 'gfdgdf',
-                            'html' => "<table class='table table-bordered'><tbody>
-                                <tr style='text-align:left'><td>Domain Name</td><td><strong></strong></td></tr>
-                                <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
-                                </tbody>
-                                </table>
-                                <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
-                                <ul style='text-align:left'>
-                                    <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
-                                    <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
-                                    <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
-                                    <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>
-                                    <li>You may see the status of your domain registration request online at our <a href='/domain_status' target='_blank'>registry</a> website.</li>
-                                </ul>
-                                <p>Thank you for requesting domain name under GOV.IN.</p>"
-                        ]);
-
-
-         //  dd($this->domainname);
+        public function increaseStep(){
+                   
             $this->resetErrorBag();
             $this->validateData();
 
@@ -623,7 +601,9 @@ class Registrationform extends Component
                                 </ul>
                                 <p>Thank you for requesting domain name under GOV.IN.</p>"
                         ]);
-                   
+
+
+                        
 
                 } catch (\Exception $e) {
 
