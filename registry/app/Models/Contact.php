@@ -10,6 +10,8 @@ class Contact extends Model
     use HasFactory;
     protected $primaryKey ='contactid';
     public $timestamps = false;
+    public $incrementing = false; 
+    protected $keyType = 'string'; 
     protected $fillable = [
             'contactid',
             'c_name',

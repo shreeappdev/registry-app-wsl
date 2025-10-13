@@ -67,7 +67,7 @@
                 <div class="collapse" id="collapseRegistration">
                     <div class="bg-white bg-white d-flex flex-column mb-3 rounded">
                         <a class="collapse-item" wire:navigate href="{{ route('domainregister') }}">Domain Registration</a>
-                        <a class="collapse-item"  wire:navigate href="{{ route('generatletter_domainreg') }}">Generate Letter</a>
+                        <a class="collapse-item"  wire:navigate href="{{ route('generateletter_domainreg') }}">Generate Letter</a>
                         <a class="collapse-item"  wire:navigate href="{{ route('submitletter_domainreg') }}">Submit Letter</a>
                     </div>
                 </div>

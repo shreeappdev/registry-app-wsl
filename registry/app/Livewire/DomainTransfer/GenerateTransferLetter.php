@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Storage;
 class GenerateTransferLetter extends Component
 {
 
-
     public $n=1;
     public $field=1;
     public $no_of_domain=1;

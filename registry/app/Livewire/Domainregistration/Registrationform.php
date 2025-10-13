@@ -461,7 +461,7 @@ class Registrationform extends Component
                             'adminid' =>  $admincontact,
                             'techid' => $techcontact,
                             'registrationdate' => $currentDate,
-                            'state_utcode' =>  $this->selectedState,
+                            'state_utcode'=>$this->region == 2 ? $this->selectedState : 'cu',
                             'orgcategory' => $this->selectedOrgcategory,
                             'region' => $this->region,
                             'ministry' => $this->selectedMinistry,
@@ -476,6 +476,7 @@ class Registrationform extends Component
                         if($this->language_code == 'en'){
                             Idndomain::insert([
                                 'domainname'=> Punycode::encodeHostName($this->hindidomainname.'.सरकार.भारत'),
+                                'domainname_decoded' => $this->hindidomainname.'.सरकार.भारत',
                                 'master_domainid'=>$domainid,
                                 'domainid'=>$idndomainid,
                                 'lang'=>'hin-deva'
@@ -557,6 +558,8 @@ class Registrationform extends Component
                         }
                        
                         DB::commit();
+                        
+
                         DomainRegistraionMultiStep::where('userid', 1)
                                                     ->where('form_id', 1)
                                                     ->delete();
@@ -585,15 +588,15 @@ class Registrationform extends Component
                         $this->dispatch('formSubmitted', [
                             'icon' => 'success',
                             'title' => 'Domain Registered successfully',
-                            'text' => $domainname,
+                            'text' => $fullDomain,
                             'html' => "<table class='table table-bordered'><tbody>
-                                <tr style='text-align:left'><td>Domain Name</td><td><strong>{$domainname}</strong></td></tr>
+                                <tr style='text-align:left'><td>Domain Name</td><td><strong>{$fullDomain}</strong></td></tr>
                                 <tr style='text-align:left'><td>Domain Status</td><td><strong>Pending - Waiting for Authorization & Forwarding Letter</strong></td></tr>
                                 </tbody>
                                 </table>
                                 <p><strong class='text-success'>Follow the steps to activate the domain</strong></p>              
                                 <ul style='text-align:left'>
-                                    <li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li>
+                                    <a href='/user/generateletter'><li>Please Generate and submit the Authorization & Forwarding (Annexure - I & Annexure - II)</li></a>
                                     <li>Generate the Authorization and Forwarding Letters formats through the registry site only and do not change the content of the format.</li>
                                     <li>Follow the instruction for generating and signing Authorization(Annexure-I) and Forwarding Letter(Annexure-II) online for registration of the domain.</li>
                                     <li>User may refer <a href='/helpdoc.php' target='_blank'>Help video</a> for complete assistance.</li>

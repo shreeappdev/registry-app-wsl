@@ -34,7 +34,11 @@ Route::get('/', function () {
    Route::get('/dashboard', Dashboard::class)->name('dashboard');
    /** Domain Registration*/
    Route::get('/domainregistration',Registrationform::class)->name('domainregister');
-   Route::get('/generateletter', Generateletter::class)->name('generatletter_domainreg');
+   Route::get('/generateletter', Generateletter::class)->name('generateletter_domainreg');
+   // Route::get('/generateletter/{letterType}/{domainid?}', Generateletter::class)
+   //  ->where('letterType', 'nodal|non-nodal')
+   //  ->name('generateletter_domainreg');
+
    Route::get('/submitletter', SubmitRegistrationLetter::class)->name('submitletter_domainreg');
 
    Route::get('/generateletter-domaincancel',Domaincancel::class)->name('generateletter_domaincancel');

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Organisation extends Model
 {
     use HasFactory;
-    protected $primaryKey='org_id';
+    protected $table = 'organisations';
+    protected $primaryKey='org_id'; 
 
     protected $fillable = [
         'org_name',

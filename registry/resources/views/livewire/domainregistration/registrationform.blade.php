@@ -164,7 +164,7 @@
                           </div>
                         @endif
 
-                        @if($isdepartmentVisible && !empty($departments) && count($departments) > 0 && $region == 1 /*&& !$is_ministry_org */)
+                        @if( !empty($departments) && count($departments) > 0 && $region == 1 /*&& !$is_ministry_org */)
                           <div class="form-group">
                             <div class="col-md-6">
                                 <label for="department" class="form-label">Select Department</label>
