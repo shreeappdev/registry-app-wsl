@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Nameserver;
+namespace App\Livewire\Backend\Nameserver;
 
 use Livewire\Component;
 

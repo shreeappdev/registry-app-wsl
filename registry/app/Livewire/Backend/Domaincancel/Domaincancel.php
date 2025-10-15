@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Domaincancel;
+namespace App\Livewire\Backend\Domaincancel;
 
 use App\Models\Domain;
 use Livewire\Component;

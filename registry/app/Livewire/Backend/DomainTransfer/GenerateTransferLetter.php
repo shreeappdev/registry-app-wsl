@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\DomainTransfer;
+namespace App\Livewire\Backend\DomainTransfer;
 
 use App\Models\Contact;
 use Livewire\Component;

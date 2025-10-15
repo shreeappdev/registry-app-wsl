@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Mydomain;
+namespace App\Livewire\Backend\Mydomain;
 
 use App\Models\Domain;
 use App\Models\Contact;

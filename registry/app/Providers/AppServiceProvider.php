@@ -29,12 +29,13 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        Route::middleware('web')
-            ->group(base_path('routes/web.php'));
+        // Route::middleware('web')
+        //     ->group(base_path('routes/web.php'));
 
         // Dashboard routes (protected)
-        Route::middleware(['web', 'auth'])
-            ->prefix('admin') // optional: gives you URLs like /admin/dashboard
+        //Route::middleware(['web', 'auth'])
+        Route::middleware('web')
+        //    ->prefix('admin') // optional: gives you URLs like /admin/dashboard
             ->group(base_path('routes/dashboard.php'));
     }
 }
