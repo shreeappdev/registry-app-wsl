@@ -65,7 +65,7 @@ class SubdomainRegistration extends Component
     public function render()
     {
         $domains=Domain::all();
-        return view('livewire.subdomain.subdomain-registration',['domains'=>$domains]);
+        return view('livewire.backend.subdomain.subdomain-registration',['domains'=>$domains]);
     }
 
     public function generateLetter()
@@ -80,7 +80,7 @@ class SubdomainRegistration extends Component
     }
     public function register(){
 
-       return view('livewire.subdomain.single-subdomain-registration');
+       return view('livewire.backend.subdomain.single-subdomain-registration');
 
     }
 

@@ -34,6 +34,6 @@ class Subdomaindetails extends Component
            ];
 
        
-        return view('livewire.subdomain.subdomaindetails',['data'=> $data]);
+        return view('livewire.backend.subdomain.subdomaindetails',['data'=> $data]);
     }
 }

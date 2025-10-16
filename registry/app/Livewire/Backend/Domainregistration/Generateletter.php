@@ -229,9 +229,9 @@ class Generateletter extends Component
             
         ];
 
-        $pdf1 = Pdf::loadView('livewire.Letterformat.domainregistration-anex1', $data);
-        $pdf2 = Pdf::loadView('livewire.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
-        $randomNumber = CustomHelper::generateCode();
+        $pdf1 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex1', $data);
+        $pdf2 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
+       $randomNumber = CustomHelper::generateCode();
 
         $filename1 = $domainDetails->domainname.$randomNumber.'_annex1.pdf';
         $filename2 = $domainDetails->domainname.$randomNumber.'_annex2.pdf';
@@ -246,6 +246,11 @@ class Generateletter extends Component
         $link1 = Storage::url("registrationletters/{$filename1}");
         $link2 = Storage::url("registrationletters/{$filename2}");
         
+        // $link1 = 'data:application/pdf;base64,' . base64_encode($pdf1->output());
+        // $link2 = 'data:application/pdf;base64,' . base64_encode($pdf2->output());
+
+
+        Domain::where('domainid', $this->domainid)->update(['signedby' => $this->nodalofficerid]);
 
         $this->dispatch('regletterGenerated', [
             'type'  => 'success',
@@ -298,6 +303,6 @@ class Generateletter extends Component
         //     return view('livewire.domainregistration.generateletter_nonnodal',$data);
         // }
         $domains = Domain::all();
-        return view('livewire.domainregistration.generateletter', ['domains' => $domains]);
+        return view('livewire.backend.domainregistration.generateletter', ['domains' => $domains]);
     }
 }

@@ -8,6 +8,6 @@ class Undertakingstatus extends Component
 {
     public function render()
     {
-        return view('livewire.nameserver.undertakingstatus');
+        return view('livewire.backend.nameserver.undertakingstatus');
     }
 }

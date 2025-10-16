@@ -13,6 +13,6 @@ class SubdomainDeactivate extends Component
     }
     public function render()
     {
-        return view('livewire.subdomain.subdomain-deactivate');
+        return view('livewire.backend.subdomain.subdomain-deactivate');
     }
 }

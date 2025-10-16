@@ -8,6 +8,6 @@ class GenerateUndertaking extends Component
 {
     public function render()
     {
-        return view('livewire.nameserver.generate-undertaking');
+        return view('livewire.backend.nameserver.generate-undertaking');
     }
 }

@@ -8,6 +8,6 @@ class UploadUndertaking extends Component
 {
     public function render()
     {
-        return view('livewire.nameserver.upload-undertaking');
+        return view('livewire.backend.nameserver.upload-undertaking');
     }
 }

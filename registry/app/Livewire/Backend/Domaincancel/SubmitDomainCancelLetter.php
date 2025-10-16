@@ -55,6 +55,6 @@ class SubmitDomainCancelLetter extends Component
    
     public function render()
     {   $domains=Domain::where('registrantid','yu7hdsy8394')->get();
-        return view('livewire.domaincancel.submit-domain-cancel-letter',['domains'=>$domains]);
+        return view('livewire.backend.domaincancel.submit-domain-cancel-letter',['domains'=>$domains]);
     }
 }

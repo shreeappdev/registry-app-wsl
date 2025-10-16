@@ -20,6 +20,6 @@ class ContactUpdateStatus extends Component
         ->where('approved','P')->get();
 
       
-        return view('livewire.mydomain.contact-update-status',['contactdata'=>$contactdata]);
+        return view('livewire.backend.mydomain.contact-update-status',['contactdata'=>$contactdata]);
     }
 }

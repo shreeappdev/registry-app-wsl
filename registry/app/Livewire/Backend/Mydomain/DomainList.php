@@ -17,6 +17,6 @@ class DomainList extends Component
 
         $domains=Domain::where('registrantid','yu7hdsy8394')->paginate(10);
 
-        return view('livewire.mydomain.domain-list',['domains'=> $domains]);
+        return view('livewire.backend.mydomain.domain-list',['domains'=> $domains]);
     }
 }

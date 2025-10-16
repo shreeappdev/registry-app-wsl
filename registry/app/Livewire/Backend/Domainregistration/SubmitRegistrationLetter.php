@@ -24,13 +24,13 @@ class SubmitRegistrationLetter extends Component
         
         $validated= $this->validate([
             'domainid' => 'required',
-            // 'anex1' => 'required|mimes:pdf|max:2048',
-            // 'anex2' => 'required|mimes:pdf|max:2048'
+            'anex1' => 'required|mimes:pdf|max:2048',
+            'anex2' => 'required|mimes:pdf|max:2048'
         ], 
         [
             'domainid.required' => 'Please choose domainname',
-            // 'anex1.required' => 'Please select Annx-I',
-            // 'anex2.required' => 'Please select Annx-II',
+            'anex1.required' => 'Please select Annx-I',
+            'anex2.required' => 'Please select Annx-II',
         ]);
 
         if($validated){
@@ -51,6 +51,6 @@ class SubmitRegistrationLetter extends Component
     {
 
         $domains = Domain::all();
-        return view('livewire.domainregistration.submit-registration-letter',['domains'=> $domains]);
+        return view('livewire.backend.domainregistration.submit-registration-letter',['domains'=> $domains]);
     }
 }

@@ -72,6 +72,6 @@ class DomainDetails extends Component
         ];
         
        
-         return view('livewire.mydomain.domain-details',['data' => $data,'orgcontactCount'=> $ifexistsOrgcontact,'admincontactCount'=>  $ifexistsadmincontact,'techcontactCount'=>$ifexiststechcontact]);
+         return view('livewire.backend.mydomain.domain-details',['data' => $data,'orgcontactCount'=> $ifexistsOrgcontact,'admincontactCount'=>  $ifexistsadmincontact,'techcontactCount'=>$ifexiststechcontact]);
     }
 }

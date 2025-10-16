@@ -24,7 +24,7 @@ class ManageSubdomain extends Component
     public function render()
     {
         $domains= Domain::where('registrantid','yu7hdsy8394')->get();
-        return view('livewire.subdomain.manage-subdomain',[
+        return view('livewire.backend.subdomain.manage-subdomain',[
             'domains'=> $domains]);
     }
 }

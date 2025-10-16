@@ -103,6 +103,6 @@ class MultipleSubdomainRegistration extends Component
  
     public function render()
     {
-        return view('livewire.subdomain.multiple-subdomain-registration');
+        return view('livewire.backend.subdomain.multiple-subdomain-registration');
     }
 }

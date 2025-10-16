@@ -14,6 +14,6 @@ class SubdomainEdit extends Component
     }
     public function render()
     {
-        return view('livewire.subdomain.subdomain-edit');
+        return view('livewire.backend.subdomain.subdomain-edit');
     }
 }

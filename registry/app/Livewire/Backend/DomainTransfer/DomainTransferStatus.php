@@ -14,6 +14,6 @@ class DomainTransferStatus extends Component
     {
 
         $allrequests= DomainDlgLetter::all();
-        return view('livewire.domain-transfer.domain-transfer-status',['allrequests'=>$allrequests]);
+        return view('livewire.backend.domain-transfer.domain-transfer-status',['allrequests'=>$allrequests]);
     }
 }

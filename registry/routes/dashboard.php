@@ -1,6 +1,5 @@
 <?php
 
-use Livewire\Livewire;
 use App\Livewire\Backend\Dashboard;
 use App\Livewire\Backend\Mydomain\DomainList;
 use Illuminate\Support\Facades\Route;

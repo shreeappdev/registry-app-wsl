@@ -18,6 +18,6 @@ class DomaincancelStatus extends Component
         ->join('registrant','registrant.registrantid','=','domains.registrantid')
         ->where('cancelletters.cancel_stage','<>','21')->get();
 
-        return view('livewire.domaincancel.domaincancel-status',['domains'=>$domains]);
+        return view('livewire.backend.domaincancel.domaincancel-status',['domains'=>$domains]);
     }
 }

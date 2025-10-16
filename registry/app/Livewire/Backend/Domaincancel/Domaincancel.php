@@ -48,7 +48,7 @@ class Domaincancel extends Component
                 }
 
              // Load the view and pass the data to it
-            $pdf = PDF::loadView('livewire.domaincancel.cancelletterformat',$data);
+            $pdf = PDF::loadView('livewire.backend.domaincancel.cancelletterformat',$data);
           
 
             // Return the generated PDF for download or inline display
@@ -82,6 +82,6 @@ class Domaincancel extends Component
     {
 
         $domains=Domain::where('registrantid','yu7hdsy8394')->get();
-        return view('livewire.domaincancel.domaincancel',['domains'=>$domains]);
+        return view('livewire.backend.domaincancel.domaincancel',['domains'=>$domains]);
     }
 }

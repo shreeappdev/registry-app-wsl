@@ -20,6 +20,6 @@ class DomainStatus extends Component
 
               
               
-         return view('livewire.mydomain.domain-status',['domains'=>$domains]);
+         return view('livewire.backend.mydomain.domain-status',['domains'=>$domains]);
     }
 }

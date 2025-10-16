@@ -16,6 +16,6 @@ class DomainTransferLetterSubmit extends Component
     public function render()
     {
         $generatedLetters= DomainDlgLetter::where(['applystatus'=>'Pending','registrantid'=>'yu756sy8309'])->get();
-        return view('livewire.domain-transfer.domain-transfer-letter-submit',['generatedLetters'=>$generatedLetters]);
+        return view('livewire.backend.domain-transfer.domain-transfer-letter-submit',['generatedLetters'=>$generatedLetters]);
     }
 }

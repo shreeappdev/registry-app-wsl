@@ -799,7 +799,7 @@ class Registrationform extends Component
         $states = StateUt::all();
         $langentension = IdnLanguage::where('lang_code',$this->language_code)->first();
       
-        return view('livewire.domainregistration.registrationform',[
+        return view('livewire.backend.domainregistration.registrationform',[
             'languages'=>$languages,
             'states'=>$states,
             'language_extension'=>$langentension,

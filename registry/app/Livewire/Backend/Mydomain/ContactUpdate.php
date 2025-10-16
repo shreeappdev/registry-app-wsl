@@ -158,6 +158,6 @@ class ContactUpdate extends Component
     {
 
         $states = DB::table('state_ut')->get();
-        return view('livewire.mydomain.contact-update',[ 'states'=>$states,'domainid' => $this->domain]);
+        return view('livewire.backend.mydomain.contact-update',[ 'states'=>$states,'domainid' => $this->domain]);
     }
 }

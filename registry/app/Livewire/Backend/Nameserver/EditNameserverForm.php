@@ -43,6 +43,6 @@ class EditNameserverForm extends Component
     {
 
        
-        return view('livewire.nameserver.edit-nameserver-form');
+        return view('livewire.backend.nameserver.edit-nameserver-form');
     }
 }

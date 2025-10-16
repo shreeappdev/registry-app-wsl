@@ -60,7 +60,7 @@ class GenerateTransferLetter extends Component
           
         ];
 
-        $pdf = pdf::loadView('livewire.Letterformat.domaintransfer', $data);
+        $pdf = pdf::loadView('livewire.backend.Letterformat.domaintransfer', $data);
 
             $filename = 'domain_transferletter'.date('dd-mm-yy-H-i-s').'.pdf';
             // Save the PDF in the public storage folder
@@ -78,6 +78,6 @@ class GenerateTransferLetter extends Component
         $getLaguges = Customdbresults::getLanguges();
         $getextention = Customdbresults::getLangugeDetails($this->language??'en');
         $this->extension=$getextention->extension;
-        return view('livewire.domain-transfer.generate-transfer-letter',['languges'=>$getLaguges]);
+        return view('livewire.backend.domain-transfer.generate-transfer-letter',['languges'=>$getLaguges]);
     }
 }
