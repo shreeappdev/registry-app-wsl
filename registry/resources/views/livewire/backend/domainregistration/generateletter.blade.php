@@ -22,10 +22,15 @@
                 </div>
             @endif --}}
             @if ($currentStep == 1)
-                <div class="form-group row">
-                    <label for="inputPassword" class="col-sm-2 col-form-label">Select Domain</label>
+                <div class="form-group row">                 
+                    <label for="domainid" class="col-sm-2 col-form-label d-flex align-items-center gap-2" style="white-space: nowrap;">
+                        <span>Select Domain</span>
+                        @if($isLtrGenerated)
+                        <a href="#" class="text-primary" style="font-size: 0.9rem; white-space: nowrap;">last-generated-letters</a>
+                        @endif
+                    </label>
                     <div class="col-sm-10">
-                        <select class="form-control @error('domainid') is-invalid @enderror" wire:model="domainid"
+                        <select class="form-control @error('domainid') is-invalid @enderror" wire:model.live="domainid"
                             id="domainid">
                             <option value="">Select Option</option>
                             @foreach ($domains as $domain)

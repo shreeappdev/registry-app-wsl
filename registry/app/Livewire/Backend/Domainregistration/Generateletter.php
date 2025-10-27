@@ -36,6 +36,8 @@ class Generateletter extends Component
    // protected $queryString = ['domainid', 'letterType'];
     public $isNewNodal = false;
     public $newNodalDetails = [];
+    public $lastGeneratedLtr;
+    public $isLtrGenerated = false;
 
 
     #[Title('Generate Registration Letter')]
@@ -119,7 +121,22 @@ class Generateletter extends Component
         }
     }
 
-    
+    public function updatedDomainid()
+    {
+        $dmnDetails = Customdbresults::domainDetails($this->domainid);       
+        $this->isLtrGenerated = (!empty($dmnDetails) && !empty($dmnDetails->signedby)) ? true : false;
+        if($this->isLtrGenerated){
+            $annex1 = "{$this->domainid}_annex1.pdf";
+            $annex2 = "{$this->domainid}_annex2.pdf";
+
+            $annex1 = storage_path("app/public/registrationletters/{$this->domainid}_annex1.pdf");
+            $annex2 = storage_path("app/public/registrationletters/{$this->domainid}_annex2.pdf");
+
+           // return file_exists($path) ? $path : null;
+        }
+        
+    }
+
     public function decreaseStep(){
         $this->resetErrorBag();
         $this->currentStep--;
@@ -231,11 +248,12 @@ class Generateletter extends Component
 
         $pdf1 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex1', $data);
         $pdf2 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
-       $randomNumber = CustomHelper::generateCode();
+      //  $randomNumber = CustomHelper::generateCode();
 
-        $filename1 = $domainDetails->domainname.$randomNumber.'_annex1.pdf';
-        $filename2 = $domainDetails->domainname.$randomNumber.'_annex2.pdf';
-
+        // $filename1 = $domainDetails->domainname.$randomNumber.'_annex1.pdf';
+        // $filename2 = $domainDetails->domainname.$randomNumber.'_annex2.pdf';
+        $filename1 = $domainDetails->domainid.'_annex1.pdf';
+        $filename2 = $domainDetails->domainid.'_annex2.pdf';
         
         $path1 = storage_path("app/public/registrationletters/{$filename1}");
         $pdf1->save($path1);
