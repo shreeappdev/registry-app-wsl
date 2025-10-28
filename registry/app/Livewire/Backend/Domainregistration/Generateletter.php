@@ -3,16 +3,8 @@
 namespace App\Livewire\Backend\Domainregistration;
 
 use App\Models\Domain;
-use App\Models\Contact;
-use App\Models\StateUt;
 use Livewire\Component;
-use App\Models\Ministry;
-use App\Models\Idndomain;
-use App\Models\Department;
 use App\Models\Designation;
-use App\Models\Orgcategory;
-use App\Models\Organisation;
-use App\Helpers\CustomHelper;
 use App\Models\NodalOfficers;
 use Livewire\Attributes\Title;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -23,7 +15,6 @@ class Generateletter extends Component
 {
 
     public $userId = 1;
-    // public $letterType = 'nodal';
     public $totalStep = 2;
     public $currentStep = 1;
     public $domainid;
@@ -33,49 +24,34 @@ class Generateletter extends Component
     public $newNodalName;
     public $newNodalEmail;
     public $selectedNewNodalDesg; 
-   // protected $queryString = ['domainid', 'letterType'];
     public $isNewNodal = false;
     public $newNodalDetails = [];
     public $lastGeneratedLtr;
     public $isLtrGenerated = false;
+    public $annex1;
+    public $annex2;
+
 
 
     #[Title('Generate Registration Letter')]
     public function mount()
     {
-       // $this->letterType = $letterType;
-        // $this->domainid = $domainid;
         $this->currentStep = 1;
     }
 
     public function increaseStep()
     {
-
         $this->resetErrorBag();
         $this->validateData();
         $this->currentStep++;
-       //dd($this->currentStep);
         if ($this->currentStep > $this->totalStep) {
             $this->currentStep = $this->totalStep;
         }
 
         if ($this->currentStep == 2) {
-
             $getdomainOrganisationDetails = Domain::where('domainid', '=', $this->domainid)->first();
-           //dd($getdomainOrganisationDetails);
-
             if ($getdomainOrganisationDetails->region == 1) {
-                
-                // $this->nodalofficers = NodalOfficers::where('fa_nodal', $this->officertype)
-                //     ->where('ministry', $getdomainOrganisationDetails->ministry)
-                //     ->where('department', $getdomainOrganisationDetails->dept)
-                //     ->where('org_id', $getdomainOrganisationDetails->org_id)
-                //     ->where('is_active', 1)
-                //     ->where('region', 'central')
-                //     ->get();
-
-
-
+            
                 $this->nodalofficers = NodalOfficers::with(['minDetails', 'deptDetails','orgDetails'])
                 ->when($this->officertype, function($q) {
                     $q->where('fa_nodal', $this->officertype);
@@ -93,30 +69,12 @@ class Generateletter extends Component
                 ->where('region', 'central')
                 ->get();
 
-               // dd($this->nodalofficers->toArray());
-
-
-
-
-           
             } else {
                 $this->nodalofficers = NodalOfficers::where('fa_nodal', $this->officertype)
                     ->where('state_utcode', $getdomainOrganisationDetails->state_utcode)
-                   // ->where('org_id', $getdomainOrganisationDetails->org_id)
                     ->where('is_active', 1)
                     ->where('region', 'state')
-                    ->get();
-                   // ->paginate(20);
-                  //  dd('esle',count($this->nodalofficers) ,$getdomainOrganisationDetails);
-
-                    // $this->nodalofficers = NodalOfficers::with(['organisationDetails'])
-                    // ->where('fa_nodal', $this->officertype)
-                    // ->where('state_utcode', $getdomainOrganisationDetails->state_utcode)
-                    // ->where('org_id', $getdomainOrganisationDetails->org_id)
-                    // ->where('is_active', 1)
-                    // ->where('region', 'state')
-                    //  ->get();
-                    
+                    ->get();                    
             }
         }
     }
@@ -125,16 +83,14 @@ class Generateletter extends Component
     {
         $dmnDetails = Customdbresults::domainDetails($this->domainid);       
         $this->isLtrGenerated = (!empty($dmnDetails) && !empty($dmnDetails->signedby)) ? true : false;
-        if($this->isLtrGenerated){
-            $annex1 = "{$this->domainid}_annex1.pdf";
-            $annex2 = "{$this->domainid}_annex2.pdf";
+        if($this->isLtrGenerated){          
+            $this->annex1 = Storage::url("registrationletters/{$this->domainid}_annex1.pdf");
+            $this->annex2 = Storage::url("registrationletters/{$this->domainid}_annex2.pdf");
+        }        
+    }
 
-            $annex1 = storage_path("app/public/registrationletters/{$this->domainid}_annex1.pdf");
-            $annex2 = storage_path("app/public/registrationletters/{$this->domainid}_annex2.pdf");
-
-           // return file_exists($path) ? $path : null;
-        }
-        
+    public function regenerateLetter(){
+        $this->isLtrGenerated = false;
     }
 
     public function decreaseStep(){
@@ -248,10 +204,7 @@ class Generateletter extends Component
 
         $pdf1 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex1', $data);
         $pdf2 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
-      //  $randomNumber = CustomHelper::generateCode();
-
-        // $filename1 = $domainDetails->domainname.$randomNumber.'_annex1.pdf';
-        // $filename2 = $domainDetails->domainname.$randomNumber.'_annex2.pdf';
+     
         $filename1 = $domainDetails->domainid.'_annex1.pdf';
         $filename2 = $domainDetails->domainid.'_annex2.pdf';
         
@@ -263,11 +216,7 @@ class Generateletter extends Component
 
         $link1 = Storage::url("registrationletters/{$filename1}");
         $link2 = Storage::url("registrationletters/{$filename2}");
-        
-        // $link1 = 'data:application/pdf;base64,' . base64_encode($pdf1->output());
-        // $link2 = 'data:application/pdf;base64,' . base64_encode($pdf2->output());
-
-
+    
         Domain::where('domainid', $this->domainid)->update(['signedby' => $this->nodalofficerid]);
 
         $this->dispatch('regletterGenerated', [
@@ -300,26 +249,6 @@ class Generateletter extends Component
     
     public function render()
     {
-        // if ($this->letterType === 'non-nodal') {
-        //     $domaindetails = Domain::where('domainid', '=', $this->domainid)->first();
-        //     $ministry = !empty($domaindetails->ministry) ? Ministry::where('m_id', $domaindetails->ministry)->value('m_name') : null;
-        //     $department = !empty($domaindetails->dept) ? Department::where('id', $domaindetails->dept)->value('name') : null;
-        //     $state = !empty($domaindetails->state_utcode) ? StateUt::where('state_utcode', $domaindetails->state_utcode)->value('state_utname'):null;
-        //     $region = $domaindetails->region == 1 ? 'central' : 'state';
-        //     $organisation = !empty($domaindetails->org_id) ? Organisation::where('org_id', $domaindetails->org_id)->value('org_name') : null;
-        //     $designations = Designation::where('region',$region)->where('allowfor_registartion',1)->get();
-        //  //   dd($designations);
-
-        //     //dd($ministry,$department,$organisation,$state,$region);
-        //     $data = [
-        //         'ministry'=>$ministry,
-        //         'department'=>$department,
-        //         'state'=>$state,
-        //         'organisation'=>$organisation,
-        //         'designations'=>$designations
-        //     ];
-        //     return view('livewire.domainregistration.generateletter_nonnodal',$data);
-        // }
         $domains = Domain::all();
         return view('livewire.backend.domainregistration.generateletter', ['domains' => $domains]);
     }

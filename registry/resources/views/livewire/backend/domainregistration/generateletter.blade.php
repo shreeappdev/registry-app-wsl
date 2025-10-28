@@ -23,12 +23,8 @@
             @endif --}}
             @if ($currentStep == 1)
                 <div class="form-group row">                 
-                    <label for="domainid" class="col-sm-2 col-form-label d-flex align-items-center gap-2" style="white-space: nowrap;">
-                        <span>Select Domain</span>
-                        @if($isLtrGenerated)
-                        <a href="#" class="text-primary" style="font-size: 0.9rem; white-space: nowrap;">last-generated-letters</a>
-                        @endif
-                    </label>
+                    <label for="inputPassword" class="col-sm-2 col-form-label">Select Domain</label>
+
                     <div class="col-sm-10">
                         <select class="form-control @error('domainid') is-invalid @enderror" wire:model.live="domainid"
                             id="domainid">
@@ -46,6 +42,31 @@
                         </div>
                     </div>
                 </div>
+                @if($isLtrGenerated)
+                <div class="form-group row">
+                    
+                    <div class="col-sm-10">
+                        <ul>
+                            <li>
+                                <i class="fa fa-check-circle" aria-hidden="true" style="color:green"></i> 
+                                <a target="_blank" style="color:#774dd3" href="{{ $annex1 }}">
+                                <strong> Download </strong> </a> last generated Authorization Letter (Anex-I)
+                            </li>
+                            <li>
+                                <i class="fa fa-check-circle" aria-hidden="true" style="color:green"></i>
+                                <a target="_blank" style="color:#774dd3" href="{{ $annex2 }}"><strong> Download </strong> </a> last generated Forwarding Letter (Anex-II)
+                            </li>
+                        
+                        </ul>
+                   
+                        <button type="button" 
+                            class="btn btn-primary btn-sm px-2 py- shadow-sm fw-semibold"
+                            wire:click="regenerateLetter()">
+                            Regenerate Letter
+                        </button>
+                    </div>
+                </div>
+                @else
                 <div class="form-group row">
                     <label for="inputPassword" class="col-sm-2 col-form-label">Sign By</label>
                     <div class="invalid-feedback d-block">
@@ -78,7 +99,7 @@
 
                     </div>
                 </div>
-
+                @endif
             @endif
 
             @if ($currentStep == 2 && !empty($nodalofficers))
@@ -141,7 +162,7 @@
                                         @endforeach
                                     @else                                
                                     <tr>
-                                        <td colspan="4" class="text-center">No Officers found.</td>
+                                        <td colspan="4" class="text-center">No Officers found. Please select Non Nodal Officer.</td>
                                     </tr>
                                     @endif
 
@@ -165,7 +186,7 @@
                         <button type="button" class="btn btn-danger" wire:click="decreaseStep()">Back</button>
                         <button type="submit" class="btn btn-success pull-right" wire:click="generateLetter()">Generate Letter</button>
                     @endif
-                    @if ($currentStep == 1)
+                    @if ($currentStep == 1 && !$isLtrGenerated)
                         <button type="button" class="btn btn-success" wire:click="increaseStep()">Next</button>
                     @endif
                     {{-- <button type="button" class="btn btn-danger" wire:click="decreaseStep()">Back</button> --}}

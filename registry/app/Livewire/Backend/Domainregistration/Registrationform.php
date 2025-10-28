@@ -456,7 +456,7 @@ class Registrationform extends Component
                             'domainname' => $domainname,
                             'lang' =>$this->language_code,
                             'dname_decoded_punycode' => $dname_decoded,
-                            'registrantid' => date('his'),
+                            'registrantid' => $this->userId,
                             'companyid' =>  $organisationcontact,
                             'adminid' =>  $admincontact,
                             'techid' => $techcontact,

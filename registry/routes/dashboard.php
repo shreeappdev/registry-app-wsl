@@ -18,6 +18,7 @@ use App\Livewire\Backend\Subdomain\ManageSubdomainLists;
 use App\Livewire\Backend\Domaincancel\DomaincancelStatus;
 use App\Livewire\Backend\Subdomain\SubdomainRegistration;
 use App\Livewire\Backend\Domainregistration\Generateletter;
+use App\Livewire\Backend\Domainregistration\ViewGeneratedLetter;
 use App\Livewire\Backend\Domainregistration\Registrationform;
 use App\Livewire\Backend\DomainTransfer\DomainTransferStatus;
 use App\Livewire\Backend\Domaincancel\SubmitDomainCancelLetter;
@@ -35,9 +36,7 @@ use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
    /** Domain Registration*/
    Route::get('/domainregistration',Registrationform::class)->name('domainregister');
    Route::get('/generateletter', Generateletter::class)->name('generateletter_domainreg');
-   // Route::get('/generateletter/{letterType}/{domainid?}', Generateletter::class)
-   //  ->where('letterType', 'nodal|non-nodal')
-   //  ->name('generateletter_domainreg');
+   Route::get('/view-generatedletter', ViewGeneratedLetter::class)->name('view_generateletter_domainreg');
 
    Route::get('/submitletter', SubmitRegistrationLetter::class)->name('submitletter_domainreg');
 
