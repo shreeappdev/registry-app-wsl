@@ -42,7 +42,7 @@
                                     @foreach ($domains as $domain)
                                         <option value={{ $domain->domainid }}
                                             {{ old('domainid') == $domain->domainid || (session('submittedData')['domainid'] ?? '') == $domain->domainid ? 'selected' : '' }}>
-                                            {{ $domain->domainname }}</option>
+                                            {{ $domain->dname_decoded_punycode }}</option>
                                     @endforeach
                                 </select>
                             </div>

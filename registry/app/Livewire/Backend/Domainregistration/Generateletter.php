@@ -84,8 +84,8 @@ class Generateletter extends Component
         $dmnDetails = Customdbresults::domainDetails($this->domainid);       
         $this->isLtrGenerated = (!empty($dmnDetails) && !empty($dmnDetails->signedby)) ? true : false;
         if($this->isLtrGenerated){          
-            $this->annex1 = Storage::url("registrationletters/{$this->domainid}_annex1.pdf");
-            $this->annex2 = Storage::url("registrationletters/{$this->domainid}_annex2.pdf");
+            $this->annex1 = Storage::url("registrationletters/generated/{$this->domainid}_annex1.pdf");
+            $this->annex2 = Storage::url("registrationletters/generated/{$this->domainid}_annex2.pdf");
         }        
     }
 
@@ -208,14 +208,14 @@ class Generateletter extends Component
         $filename1 = $domainDetails->domainid.'_annex1.pdf';
         $filename2 = $domainDetails->domainid.'_annex2.pdf';
         
-        $path1 = storage_path("app/public/registrationletters/{$filename1}");
+        $path1 = storage_path("app/public/registrationletters/generated/{$filename1}");
         $pdf1->save($path1);
 
-        $path2 = storage_path("app/public/registrationletters/{$filename2}");
+        $path2 = storage_path("app/public/registrationletters/generated/{$filename2}");
         $pdf2->save($path2);
 
-        $link1 = Storage::url("registrationletters/{$filename1}");
-        $link2 = Storage::url("registrationletters/{$filename2}");
+        $link1 = Storage::url("registrationletters/generated/{$filename1}");
+        $link2 = Storage::url("registrationletters/generated/{$filename2}");
     
         Domain::where('domainid', $this->domainid)->update(['signedby' => $this->nodalofficerid]);
 

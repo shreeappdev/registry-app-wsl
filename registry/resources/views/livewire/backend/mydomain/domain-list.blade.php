@@ -22,9 +22,9 @@
                         @foreach ($domains as $domain)
                             <tr>
                                 <td class="text-center">{{ $i++ }}</td>
-                                <td>{{ $domain->domainname }}</td>
+                                <td>{{ $domain->dname_decoded_punycode }}</td>
                                 <td>{{ date('d-m-Y', $domain->activatation_date) }}</td>
-                                <td><a href="{{route('single-domain',['domainid' => $domain->domainid]) }}"><button class="btn btn-success"> View</button></a></td>
+                                <td><a href="{{route('single-domain',['domainid' => $domain->domainid]) }}"><button class="btn btn-outline-primary btn-sm"> View</button></a></td>
                             </tr>
                         @endforeach
                     </tbody>

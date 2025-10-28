@@ -570,7 +570,7 @@
                 timer: null,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                footer: '<a href="/user/generateletter">Generate letter to activate the Domain</a>'
+                footer: '<a class="btn btn-outline-primary btn-sm" href="/user/generateletter">Generate letter to activate the Domain</a>'
 
             }); // Show alert with the message
         });

@@ -22,11 +22,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $i=1;@endphp
+                        
                         @foreach ($domains as $domain)
                             <tr>
-                                <td class="text-center">{{ $i++ }}</td>
-                                <td>{{ $domain->domainname }}</td>
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td>{{ $domain->dname_decoded_punycode }}</td>
                                                     
                                 <td>
                                     @if($domain->registrationLetters()->exists())

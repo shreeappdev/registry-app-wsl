@@ -9,7 +9,7 @@
                     @foreach ($domains as $domain)
                         <option value={{ $domain->domainid }}
                             {{ old('domainid') == $domain->domainid || (session('submittedData')['domainid'] ?? '') == $domain->domainid ? 'selected' : '' }}>
-                            {{ $domain->domainname }}</option>
+                            {{ $domain->dname_decoded_punycode }}</option>
                     @endforeach
                 </select>
 
@@ -93,11 +93,11 @@
                         @foreach ($generatedSubdomainLetter as $domain)
                             <tr>
                                 <td class="text-center">{{ $i++ }}</td>
-                                <td>{{ $domain->domainname }}</td>
+                                <td>{{ $domain->dname_decoded_punycode }}</td>
                                 <td>{{ $domain->uploaddate }}</td>
                                 <td>
-                                    <a href="{{ route('single-domain', ['domainid' => $domain->domainname]) }}"><button class="btn btn-info btn-sm"> View</button></a>
-                                    <a href="{{ route('single-domain', ['domainid' => $domain->domainname]) }}"><button class="btn btn-success btn-sm"> Esign</button></a>
+                                    <a href="{{ route('single-domain', ['domainid' => $domain->domainid]) }}"><button class="btn btn-info btn-sm"> View</button></a>
+                                    <a href="{{ route('single-domain', ['domainid' => $domain->domainid]) }}"><button class="btn btn-success btn-sm"> Esign</button></a>
                                    <button class="btn btn-warning btn-sm" wire:click="openModal({{ $domain->t_id}})"> Ink Sign</button>
                                 </td>
                             </tr>

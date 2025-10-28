@@ -21,7 +21,7 @@
                         <select class="form-control @error('domainid') is-invalid @enderror" wire:model="domainid"  id="domainid" >
                             <option value="0">Select Option</option>
                             @foreach ($domains as $domain)
-                                <option value={{$domain->domainid }} {{ (old('domainid') == $domain->domainid || (session('submittedData')['domainid'] ?? '') == $domain->domainid) ? 'selected' : '' }}> {{ $domain->domainname }}</option>
+                                <option value={{$domain->domainid }} {{ (old('domainid') == $domain->domainid || (session('submittedData')['domainid'] ?? '') == $domain->domainid) ? 'selected' : '' }}> {{ $domain->dname_decoded_punycode }}</option>
                             @endforeach
                         </select>
                       </div>

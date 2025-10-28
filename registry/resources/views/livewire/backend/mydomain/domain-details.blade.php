@@ -25,7 +25,7 @@
                     </p>
                     <ul class="list-group">
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pt-0 pb-1 text-sm"><span
-                                class="text-secondary">Domain Name:</span> &nbsp; {{$data['domaindetails']->domainname ?? "No Data"}}</li>
+                                class="text-secondary">Domain Name:</span> &nbsp; {{$data['domaindetails']->dname_decoded_punycode ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span
                                 class="text-secondary">Activation Date:</span> &nbsp; {{$data['domaindetails']->activation_date ?? "No Data"}}</li>
                         <li class="list-group-item border-0 ps-0 text-dark font-weight-semibold pb-1 text-sm"><span

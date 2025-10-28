@@ -22,11 +22,11 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $domain->dname_decoded_punycode }}</td>
                             <td>
-                                @if (Storage::exists("public/registrationletters/{$domain->domainid}_annex1.pdf"))
-                                    <a href="{{ Storage::url("registrationletters/{$domain->domainid}_annex1.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex I</a>
+                                @if (Storage::exists("public/registrationletters/generated/{$domain->domainid}_annex1.pdf"))
+                                    <a href="{{ Storage::url("registrationletters/generated/{$domain->domainid}_annex1.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex I</a>
                                 @endif
-                                @if (Storage::exists("public/registrationletters/{$domain->domainid}_annex2.pdf"))
-                                    <a href="{{ Storage::url("registrationletters/{$domain->domainid}_annex2.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex II</a>
+                                @if (Storage::exists("public/registrationletters/generated/{$domain->domainid}_annex2.pdf"))
+                                    <a href="{{ Storage::url("registrationletters/generated/{$domain->domainid}_annex2.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex II</a>
                                 @endif
 
                             </td>

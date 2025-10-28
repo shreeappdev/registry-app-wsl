@@ -11,7 +11,7 @@
             <select class="form-control @error('domainid') is-invalid @enderror" wire:model="domainid" id="domainid" >
                 <option value=> Select Domain </option>
                 @foreach ($domains as $domain)
-                    <option value={{ $domain->domainid }}> {{ $domain->domainname }}</option>
+                    <option value={{ $domain->domainid }}> {{ $domain->dname_decoded_punycode }}</option>
                 @endforeach
             </select>
             <div class="invalid-feedback">

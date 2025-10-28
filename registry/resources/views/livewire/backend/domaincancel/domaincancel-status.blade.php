@@ -26,7 +26,7 @@
                         @foreach ($domains as $domain)
                             <tr>
                                 <td class="text-center">{{ $i++ }}</td>
-                                <td>{{ $domain->domainname }}</td>
+                                <td>{{ $domain->dname_decoded_punycode }}</td>
                                                     
                                 <td>
                                   

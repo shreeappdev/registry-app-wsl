@@ -11,7 +11,7 @@
       <div class="col-sm-10">
         <select class="form-control @error('domainid') is-invalid @enderror" wire:model="domainid">
             <option value="">..select..</option>
-            @foreach ($domains as $domain)
+            @foreach ($this->generatedLtr as $domain)
                 <option value={{$domain->domainid }}> {{ $domain->dname_decoded_punycode }}</option>
             @endforeach
         </select>
@@ -25,9 +25,9 @@
    <div class="form-group row">
         <label for="inputPassword" class="col-sm-2 col-form-label">Upload Annexure 1</label>
         <div class="col-sm-10">
-            <input type="file"  wire:model="anex1" class="form-control-file @error('anex1') is-invalid @enderror" >
+            <input type="file"  wire:model="annex1" class="form-control-file @error('annex1') is-invalid @enderror" >
             <div class="invalid-feedback">
-                @error('anex1')
+                @error('annex1')
                     {{ $message }}
                 @enderror
             </div>
@@ -37,9 +37,9 @@
     <label for="inputPassword" class="col-sm-2 col-form-label">Upload Annexure II</label>
     <div class="col-sm-10">
 
-        <input type="file"  wire:model="anex2" class="form-control-file @error('anex2') is-invalid @enderror">
+        <input type="file"  wire:model="annex2" class="form-control-file @error('annex2') is-invalid @enderror">
         <div class="invalid-feedback">
-            @error('anex2')
+            @error('annex2')
                 {{ $message }}
             @enderror
         </div>
@@ -48,7 +48,7 @@
     <div class="form-group row">
         <label for="submit" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <button type="submit" class="btn btn-success">Submit Request</button>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
         </div>
     </div>
   </form>

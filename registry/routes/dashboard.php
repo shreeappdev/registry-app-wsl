@@ -37,7 +37,6 @@ use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
    Route::get('/domainregistration',Registrationform::class)->name('domainregister');
    Route::get('/generateletter', Generateletter::class)->name('generateletter_domainreg');
    Route::get('/view-generatedletter', ViewGeneratedLetter::class)->name('view_generateletter_domainreg');
-
    Route::get('/submitletter', SubmitRegistrationLetter::class)->name('submitletter_domainreg');
 
    Route::get('/generateletter-domaincancel',Domaincancel::class)->name('generateletter_domaincancel');

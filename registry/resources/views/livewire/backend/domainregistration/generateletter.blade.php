@@ -210,7 +210,7 @@
                 timer: null,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                footer: '<a href="/user/dashboard">Back to Dashboard</a>'
+                footer: '<a class="btn btn-outline-primary btn-sm" href="/user/submitletter">Submit Letter</a>'
 
             }); // Show alert with the message
         });
