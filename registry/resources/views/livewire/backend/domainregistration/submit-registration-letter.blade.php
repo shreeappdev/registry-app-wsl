@@ -22,6 +22,34 @@
         </div>
       </div>
     </div>
+
+    <div class="form-group row">
+        <label for="inputPassword" class="col-sm-2 col-form-label">Sign Type</label>
+        <div class="invalid-feedback d-block">
+            @error('signtype')
+                {{ $message }}
+            @enderror
+        </div>
+        <div class="col-sm-10">
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input @error('signtype') is-invalid @enderror" type="radio" wire:model.live="signtype" id="manual"
+                    value="manual">
+                <label class="form-check-label" for="manual">
+                    Manual
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input @error('signtype') is-invalid @enderror" type="radio" wire:model.live="signtype" id="esign"
+                    value="esign">
+                <label class="form-check-label" for="esign">
+                    Esign
+                </label>
+            </div>
+        </div>
+    </div>
+
+    @if($isManual)
    <div class="form-group row">
         <label for="inputPassword" class="col-sm-2 col-form-label">Upload Annexure 1</label>
         <div class="col-sm-10">
@@ -35,21 +63,22 @@
    </div>
    <div class="form-group row">
     <label for="inputPassword" class="col-sm-2 col-form-label">Upload Annexure II</label>
-    <div class="col-sm-10">
-
-        <input type="file"  wire:model="annex2" class="form-control-file @error('annex2') is-invalid @enderror">
-        <div class="invalid-feedback">
-            @error('annex2')
-                {{ $message }}
-            @enderror
+        <div class="col-sm-10">
+            <input type="file"  wire:model="annex2" class="form-control-file @error('annex2') is-invalid @enderror">
+            <div class="invalid-feedback">
+                @error('annex2')
+                    {{ $message }}
+                @enderror
+            </div>
         </div>
-    </div>
- </div>
+   </div>
+    @endif
     <div class="form-group row">
         <label for="submit" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
             <button type="submit" class="btn btn-primary btn-sm">Submit</button>
         </div>
     </div>
+    
   </form>
 </div>

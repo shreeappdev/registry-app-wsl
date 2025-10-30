@@ -9,17 +9,17 @@ class Authletter extends Model
 {
     use HasFactory;
      protected $primaryKey="authid";
-     protected $fillable = ['domainid','lettertype','file_name','as_remark'];
+     protected $fillable = ['domainid','lettertype','as_reason','s3bucket_key',];
      public $timestamps = false;
 
-    public function domain()
-    {
-        return $this->belongsTo(Domain::class,'domainid','authid'); // authid is local orimary key and domainid is foreign key
-        //need to define these keys of authletters table
-    }
+    // public function domain()
+    // {
+    //     return $this->belongsTo(Domain::class,'domainid','authid'); // authid is local orimary key and domainid is foreign key
+    //     //need to define these keys of authletters table
+    // }
 
-    public function asReason()
-    {
-        return $this->hasOne(AsReason::class, 'as_reason_no', 'as_reason'); //as_reason is take from authletters table and as_Reason_no is foreign key of as_reason table 
-    }
+    // public function asReason()
+    // {
+    //     return $this->hasOne(AsReason::class, 'as_reason_no', 'as_reason'); //as_reason is take from authletters table and as_Reason_no is foreign key of as_reason table 
+    // }
 }

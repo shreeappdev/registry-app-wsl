@@ -18,15 +18,20 @@
                     </thead>
                     <tbody>
                        @foreach ($this->generatedLtr as $domain)
+                       @php 
+                       $annex1 = getAnnex1($domain->domainname, $domain->domainid, 'reg');
+                       $annex2 = getAnnex2($domain->domainname, $domain->domainid, 'reg');
+
+                       @endphp
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $domain->dname_decoded_punycode }}</td>
                             <td>
-                                @if (Storage::exists("public/registrationletters/generated/{$domain->domainid}_annex1.pdf"))
-                                    <a href="{{ Storage::url("registrationletters/generated/{$domain->domainid}_annex1.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex I</a>
+                                @if (Storage::exists("public/registrationletters/generated/{$annex1}"))
+                                    <a href="{{ Storage::url("registrationletters/generated/{$annex1}") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex I</a>
                                 @endif
-                                @if (Storage::exists("public/registrationletters/generated/{$domain->domainid}_annex2.pdf"))
-                                    <a href="{{ Storage::url("registrationletters/generated/{$domain->domainid}_annex2.pdf") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex II</a>
+                                @if (Storage::exists("public/registrationletters/generated/{$annex2}"))
+                                    <a href="{{ Storage::url("registrationletters/generated/{$annex2}") }}" target="_blank" class="btn btn-outline-primary btn-sm">View Annex II</a>
                                 @endif
 
                             </td>

@@ -84,8 +84,12 @@ class Generateletter extends Component
         $dmnDetails = Customdbresults::domainDetails($this->domainid);       
         $this->isLtrGenerated = (!empty($dmnDetails) && !empty($dmnDetails->signedby)) ? true : false;
         if($this->isLtrGenerated){          
-            $this->annex1 = Storage::url("registrationletters/generated/{$this->domainid}_annex1.pdf");
-            $this->annex2 = Storage::url("registrationletters/generated/{$this->domainid}_annex2.pdf");
+            $this->annex1 = Storage::url(
+                            'registrationletters/generated/' . getAnnex1($dmnDetails->domainname, $dmnDetails->domainid, 'reg')
+                            );
+            $this->annex2 = Storage::url(
+                            'registrationletters/generated/' . getAnnex2($dmnDetails->domainname, $dmnDetails->domainid, 'reg')
+                            );
         }        
     }
 
@@ -204,9 +208,9 @@ class Generateletter extends Component
 
         $pdf1 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex1', $data);
         $pdf2 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
-     
-        $filename1 = $domainDetails->domainid.'_annex1.pdf';
-        $filename2 = $domainDetails->domainid.'_annex2.pdf';
+
+        $filename1 = getAnnex1($domainDetails->domainname,$domainDetails->domainid,'reg');
+        $filename2 = getAnnex2($domainDetails->domainname,$domainDetails->domainid,'reg');
         
         $path1 = storage_path("app/public/registrationletters/generated/{$filename1}");
         $pdf1->save($path1);
