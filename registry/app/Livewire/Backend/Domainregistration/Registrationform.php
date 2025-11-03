@@ -9,7 +9,6 @@ use Livewire\Component;
 use App\Models\Ministry;
 use App\Helpers\Punycode;
 use App\Models\Idndomain;
-use App\Rules\DomainRule;
 use App\Models\Department;
 use App\Models\IdnLanguage;
 use App\Models\Orgcategory;
@@ -19,7 +18,6 @@ use App\Models\Nameserver_data;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
-use App\Rules\SelectedDepartmentRequired;
 use App\Models\DomainRegistraionMultiStep;
 use App\Mail\SendMail;
 use Illuminate\Support\Facades\Mail;
@@ -468,7 +466,8 @@ class Registrationform extends Component
                             'dept' => $this->selectedDepartment,
                             'org_id' => $this->selectedOrganisation,
                             'has_idns'=>$this->language_code == 'en'? 1 : 0,
-                            'remarks' =>''
+                            'remarks' =>'',
+                            'nic_hosting'=> $this->isChecked ? 1 : 2
                             
                         ]);
 

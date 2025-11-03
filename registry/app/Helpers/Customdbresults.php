@@ -21,15 +21,17 @@ class Customdbresults
         return $getLangdetails;
     }
 
-    public static function domainDetails($d_id,$data=[]){
+    public static function domainDetails($domainid,$data=[]){
+         if (empty($domainid)) return null; 
+
          $domain = Domain::with($data)
-        ->where('domainid', $d_id)
+        ->where('domainid', $domainid)
         ->first();
         return $domain;
     }
 
     public static function nodalOfficersDetails($faid, $data=[]){
-    //    dd($faid,$data);
+        if (empty($faid)) return null; 
          $domain = NodalOfficers::with($data)
         ->where('faid', $faid)
         ->first();

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Ministry;      
@@ -16,7 +15,9 @@ class Domain extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    public $PrimarKey='domainid';
+    protected $primaryKey='domainid';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = ['domainid','domainname','lang','dname_decoded_punycode','registrantid','companyid','adminid','techid','registrationdate','updationdate','state_utcode','expirationdate','orgcategory','region','ministry','dept','org_id','has_idns','activation_stage','activation_status','mailsent','signedby','activation_date','remarks','nic_hod_hog_div_code'];
 
 
