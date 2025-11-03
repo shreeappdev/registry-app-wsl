@@ -25,6 +25,7 @@ use App\Livewire\Backend\Domaincancel\SubmitDomainCancelLetter;
 use App\Livewire\Backend\DomainTransfer\GenerateTransferLetter;
 use App\Livewire\Backend\DomainTransfer\DomainTransferLetterSubmit;
 use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
+use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -38,20 +39,25 @@ use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
    Route::get('/generateletter', Generateletter::class)->name('generateletter_domainreg');
    Route::get('/view-generatedletter', ViewGeneratedLetter::class)->name('view_generateletter_domainreg');
    Route::get('/submitletter', SubmitRegistrationLetter::class)->name('submitletter_domainreg');
-
+   /** Domain cancel*/
    Route::get('/generateletter-domaincancel',Domaincancel::class)->name('generateletter_domaincancel');
    Route::get('/submitletter-domaincancel', SubmitDomainCancelLetter::class)->name('submitletter_domaincancel');
+
+   /** SubDomain Registration*/
+   Route::get('/single-subdomain-registration', SingleSubdomainReg::class)->name('single_subdomain_registration');
+
+
 
    Route::get('/subdomain-registration', SubdomainRegistration::class)->name('subdomain_registration');
    // Route::get('/multiple-subdomain-registration/{id}', MultipleSubdomainRegister::class)->name('multiplesubdomain_register');
 
    Route::get('/multiplesubdomain-registration', MultipleSubdomainRegistration::class)->name('bulksubdomain_register');
 
-    Route::get('/subdomain-management',ManageSubdomain::class)->name('manage_subdomain');
-    Route::get('/subdomain-lists',ManageSubdomainLists::class)->name('subdomain-lists');
-    Route::get('/subdomain-details/{subdomain}',Subdomaindetails::class)->name('subdomain-details');
-    Route::get('/subdomain-edit/{subdomain}',SubdomainEdit::class)->name('subdomain-edit');
-    Route::get('/subdomain-deactivate/{subdomain}',SubdomainDeactivate::class)->name('subdomain-deactivate');
+   Route::get('/subdomain-management',ManageSubdomain::class)->name('manage_subdomain');
+   Route::get('/subdomain-lists',ManageSubdomainLists::class)->name('subdomain-lists');
+   Route::get('/subdomain-details/{subdomain}',Subdomaindetails::class)->name('subdomain-details');
+   Route::get('/subdomain-edit/{subdomain}',SubdomainEdit::class)->name('subdomain-edit');
+   Route::get('/subdomain-deactivate/{subdomain}',SubdomainDeactivate::class)->name('subdomain-deactivate');
 
    Route::get('/domaintransfer-generateletter', GenerateTransferLetter::class)->name('domaintrnsfer_generateletter');
    Route::get('/domaintransfer-submitletter', DomainTransferLetterSubmit::class)->name('domaintransfer_submitletter');
