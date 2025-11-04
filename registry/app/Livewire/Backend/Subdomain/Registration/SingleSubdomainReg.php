@@ -7,6 +7,8 @@ use App\Helpers\Customdbresults;
 use Livewire\Component;
 use App\Models\Domain;
 use App\Models\SubdomainFldTransactional;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class SingleSubdomainReg extends Component 
 {
@@ -23,10 +25,7 @@ class SingleSubdomainReg extends Component
 
     
     public function updatedSelectedDomainid($value){
-       
-       logger('Selected domain id:', [$this->selectedDomainid,$value]);
-        $this->signingAuthority = Customdbresults::domainDetails($this->selectedDomainid,['orgContactDetails', 'adminContactDetails']);
-             
+        $this->signingAuthority = Customdbresults::domainDetails($this->selectedDomainid,['orgContactDetails', 'adminContactDetails']);           
     }
 
     public function updatedSelectedMapping($value){
@@ -87,48 +86,43 @@ class SingleSubdomainReg extends Component
     }
 
     public function register(){
+     
         $this->resetErrorBag();
         $this->validateData();
         try{
         
+            $subdomainid = 'SUBD'.date('dmy').date('his');
             $domainname = Domain::where('domainid',$this->selectedDomainid)->value('domainname');
+            $subdomainname = $this->subdomainName.'.'.$domainname;
           
-            SubdomainFldTransactional::create([
-                'subdomainid'=> 'SUBD'.date('dmy').date('his'),
-                'subdomainname' => $this->subdomainName.'.'.$domainname,
-                'domainid' => $this->selectedDomainid,
-                'multipleips' =>serialize($this->ips),
-                'multiplecname' => serialize([$this->cName]),           
-            ]);
+            // SubdomainFldTransactional::create([
+            //     'subdomainid'=> $subdomainid,
+            //     'subdomainname' => $subdomainname,
+            //     'domainid' => $this->selectedDomainid,
+            //     'multipleips' =>serialize($this->ips),
+            //     'multiplecname' => serialize([$this->cName]),           
+            // ]);
 
             // generate letter
-             $pdf1 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex1', $data);
-        $pdf2 = Pdf::loadView('livewire.backend.Letterformat.domainregistration-anex2', array_merge($data, $nodal_details));
+            $pdf = Pdf::loadView('livewire.backend.Letterformat.subdomain_registration');
 
-        $filename1 = getAnnex1($domainDetails->domainname,$domainDetails->domainid,'reg');
-        $filename2 = getAnnex2($domainDetails->domainname,$domainDetails->domainid,'reg');
-        
-        $path1 = storage_path("app/public/registrationletters/generated/{$filename1}");
-        $pdf1->save($path1);
+            $filename = letterName($subdomainname,$subdomainid,'sub_reg');
+           
+            $path = storage_path("app/public/registrationletters/generated/{$filename}");
+          //   dd($path);
+            $pdf->save($path);
 
-        $path2 = storage_path("app/public/registrationletters/generated/{$filename2}");
-        $pdf2->save($path2);
-
-        $link1 = Storage::url("registrationletters/generated/{$filename1}");
-        $link2 = Storage::url("registrationletters/generated/{$filename2}");
-    
-        Domain::where('domainid', $this->domainid)->update(['signedby' => $this->nodalofficerid]);
-
-        $this->dispatch('regletterGenerated', [
-            'type'  => 'success',
-            'title' => 'Letter Generated',
-            'text'  => $domainname,
-            'date'  => now()->format('Y-m-d'),
-            'html'  => "<p>Annexure I and II has been generated successfully.<br>
-                        <a href='{$link1}' target='_blank'>Download the Annexure I</a><br>
-                        <a href='{$link2}' target='_blank'>Download the Annexure II</a>
-                        </p>",
-        ]);    
+            $link = Storage::url("registrationletters/generated/{$filename}");
+        //dd($link, $path);
+            $this->dispatch('subDomainReg', [
+                'type'  => 'success',
+                'title' => 'Letter Generated',
+                'text'  => $subdomainname,
+                'date'  => now()->format('Y-m-d'),
+                'html'  => "<p>Annexure I and II has been generated successfully.<br>
+                            <a href='{$link}' target='_blank'>Download Letter.</a><br>
+                            </p>",
+            ]);    
 
 
         }catch (\Exception $e) {

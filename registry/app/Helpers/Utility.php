@@ -11,4 +11,10 @@
         return "{$name}_{$id}_{$type}_annex2.pdf";
     }
 
+     function letterName($name,$id,$type)
+    {
+        return "{$name}_{$id}_{$type}.pdf";
+    }
+
+
    

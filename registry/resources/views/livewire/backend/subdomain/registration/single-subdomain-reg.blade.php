@@ -138,3 +138,23 @@
 
     </form>
 </div>
+@script
+    <script>
+        window.addEventListener('subDomainReg', (event) => {
+            let data = event.detail[0];
+            Swal.fire({
+                position: 'center',
+                width: 800,
+                showConfirmButton: false,
+                title: data.title,
+                icon: data.icon,
+                html: data.html,
+                timer: null,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                footer: '<a class="btn btn-outline-primary btn-sm" href="/user/submitletter">Submit Letter</a>'
+
+            }); // Show alert with the message
+        });
+    </script>
+@endscript
