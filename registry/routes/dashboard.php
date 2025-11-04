@@ -27,9 +27,6 @@ use App\Livewire\Backend\DomainTransfer\DomainTransferLetterSubmit;
 use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
 use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
    Route::prefix('user')->group(function () {
 
@@ -43,8 +40,9 @@ use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
    Route::get('/generateletter-domaincancel',Domaincancel::class)->name('generateletter_domaincancel');
    Route::get('/submitletter-domaincancel', SubmitDomainCancelLetter::class)->name('submitletter_domaincancel');
 
-   /** SubDomain Registration*/
+   /** Single SubDomain Registration*/
    Route::get('/single-subdomain-registration', SingleSubdomainReg::class)->name('single_subdomain_registration');
+   Route::get('/single-subdomain-submitletter', SingleSubdomainReg::class)->name('single_subdomain_submitletter');
 
 
 

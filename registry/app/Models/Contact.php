@@ -28,4 +28,11 @@ class Contact extends Model
             'mobileno',
             'email'
         ];
+
+    public static function selectedDetails($id)
+    {
+        return self::select('c_name', 'designation')
+            ->where('contactid', $id)
+            ->first();
+    }
 }

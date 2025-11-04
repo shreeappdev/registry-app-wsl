@@ -24,7 +24,7 @@
     </head>
     <body>		
         <div class="fwd">
-			  <p class="anex1"><strong><u>Subdomain Registration/Update Letter</u></strong></p>			
+			  <p class="anex1"><strong><u>Subdomain Registration</u></strong></p>			
 			  <div class="declare">
 
 					<p>To,
@@ -35,7 +35,7 @@
 					New Delhi - 110 003 <br>  
 
 					<p>Dear Domain Registrar,</p>
-					<p>I am the authorized user to register sub-domain(s) under the 3rd level domain {domain_name}.
+					<p>I am the authorized user to register sub-domain(s) under the 3rd level domain <strong>{{ $domainname }}</strong>.
 						I formally request you to activate/update the following sub-domain(s) registered online.
 					</p>
 				<table>
@@ -46,8 +46,21 @@
 					</tr>
 					<tr>
 				
-						<td>{subdomainname} </td>
-						<td>{mappedip}</td>
+						<td>{{ $subdomainname }} </td>
+						<td>
+							@if(!empty($cname))
+							  {{ $cname }}
+							@else
+								@if(!empty($ips))
+								<ul>
+									@foreach ($ips as $ip)
+									<li>{{ $ip }}</li>	
+									@endforeach
+								</ul>
+								@endif
+							@endif
+
+						</td>
 					</tr>
 					
 				</table>
@@ -56,8 +69,8 @@
 						The sub-domain names would be used for official purposes and would conform to the IT Act of India and Aadhaar Act, 2016. Domain name will not be used for any unlawful & commercial purpose and as per MHA OM; the website will be hosted in India only.
 					</p>
 					<p>Thanks,</p>
-					<p><i>Name & Designation: </i> :{contact_name_designation}</p>
-					<p><i>Date</i>: {date} </p>
+					<p><i>Name & Designation</i>: {{ $authorityName }} , {{ $authorityDesg }}</p>
+					<p><i>Date</i>: {{ $date }} </p>
 					<p><i>Signature</i>:</p>
 		      </div>
 				<p style="text-align:center;">=============================</p>			
