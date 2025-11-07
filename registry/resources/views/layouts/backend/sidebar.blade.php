@@ -222,7 +222,7 @@
                 <div class="collapse" id="collapseSubDomain">
                     <div class="bg-white d-flex flex-column mb-3 rounded">
                          <a class="collapse-item" wire:navigate href="{{ route('single_subdomain_registration') }}">Registration</a>
-                         <a class="collapse-item" wire:navigate href="{{ route('bulksubdomain_register') }}">Submit Letter</a>
+                         <a class="collapse-item" wire:navigate href="{{ route('single_subdomain_submitletter') }}">Submit Letter</a>
                         <a class="collapse-item" wire:navigate href="{{ route('manage_subdomain') }}">View Generated Letter</a>
                         {{-- <a class="collapse-item" wire:navigate href="">Multiple Deactivation</a> --}}
                     </div>

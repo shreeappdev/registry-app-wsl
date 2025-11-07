@@ -52,14 +52,6 @@ class SubmitRegistrationLetter extends Component
 
             Domain::where('domainid', $this->domainid)->update(['activation_stage' => 7]);
 
-        //     // save on storage
-        //     $directory = 'public/registrationletters/uploaded';
-           
-        //   //  $timestamp = now()->format('Ymd_His');
-        //     $filename1 =$this->domainid.'_annex1.pdf';
-        //     $filename2 =$this->domainid.'_annex2.pdf';
-
-            // Store files in storage/app/public/registrationletters/
             $this->annex1->storeAs('public/registrationletters/uploaded', $annex1File);
             $this->annex2->storeAs('public/registrationletters/uploaded', $annex2File);
 

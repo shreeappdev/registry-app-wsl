@@ -26,7 +26,7 @@ use App\Livewire\Backend\DomainTransfer\GenerateTransferLetter;
 use App\Livewire\Backend\DomainTransfer\DomainTransferLetterSubmit;
 use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
 use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
-
+use App\Livewire\Backend\Subdomain\SubmitLetter\SingleSubdomainSubmitLetter;
 
    Route::prefix('user')->group(function () {
 
@@ -42,7 +42,7 @@ use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
 
    /** Single SubDomain Registration*/
    Route::get('/single-subdomain-registration', SingleSubdomainReg::class)->name('single_subdomain_registration');
-   Route::get('/single-subdomain-submitletter', SingleSubdomainReg::class)->name('single_subdomain_submitletter');
+   Route::get('/single-subdomain-submitletter', SingleSubdomainSubmitLetter::class)->name('single_subdomain_submitletter');
 
 
 

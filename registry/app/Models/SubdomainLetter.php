@@ -10,10 +10,10 @@ class SubdomainLetter extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
     protected $table="domain_fld_letters";
     protected $primaryKey="t_id";
-    protected $fillable = ['subdomainid','domainname','subdomainname'];
-     public $timestamps = false;
+    protected $fillable = ['subdomainid','s3bucket_key','subdomainname'];
 
 
      public function subdomain()
