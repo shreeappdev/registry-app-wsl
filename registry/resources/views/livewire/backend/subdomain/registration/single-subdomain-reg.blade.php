@@ -1,12 +1,12 @@
 <div>
-    {{-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Register Single SubDomain</h1>
-    </div> --}}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h4 class="h3 mb-0 text-gray-800">Register Single SubDomain</h4>
+    </div>
     <form class="row needs-validation" method= "post" wire:submit.prevent="register" novalidate>
          @csrf
         <div class="card">
             <div class="card-header bg-primary text-white shadow">
-                Register Single SubDomain
+                It allows to register Subdomains (fourth/fifth level) under an active 3rd level domain which is hosted in NIC Data Centre only( abc.xyz.gov.in is a fourth level domain under a 3rd level domain name xyz.gov.in / abc.def.xyz.gov.in is a fifth level domain under a 3rd level domain name xyz.gov.in).
             </div>
            
             <div class="card-body">

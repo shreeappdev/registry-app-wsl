@@ -230,8 +230,8 @@
             </li>
 
              <li class="nav-item">
-                <a class="nav-link" href="#collapseSubDomain" data-bs-toggle="collapse"
-                    role="button" aria-expanded="false" aria-controls="collapseSubDomain">
+                <a class="nav-link" href="#collapseMultiSubDomain" data-bs-toggle="collapse"
+                    role="button" aria-expanded="false" aria-controls="collapseMultiSubDomain">
                     <div
                         class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
                         <svg width="30px" height="30px" viewBox="0 0 48 48" version="1.1"
@@ -258,9 +258,9 @@
                     </div>
                     <span class="nav-link-text ms-1">Multiple Subdomain </span>
                 </a>
-                <div class="collapse" id="collapseSubDomain">
+                <div class="collapse" id="collapseMultiSubDomain">
                     <div class="bg-white d-flex flex-column mb-3 rounded">
-                         <a class="collapse-item" wire:navigate href="{{ route('subdomain_registration') }}">Registration</a>
+                         <a class="collapse-item" wire:navigate href="{{ route('multi_subdomain_registration') }}">Registration</a>
                          <a class="collapse-item" wire:navigate href="{{ route('bulksubdomain_register') }}">Submit Letter</a>
                         <a class="collapse-item" wire:navigate href="{{ route('manage_subdomain') }}">View Generated Letter</a>
                         {{-- <a class="collapse-item" wire:navigate href="">Multiple Deactivation</a> --}}
