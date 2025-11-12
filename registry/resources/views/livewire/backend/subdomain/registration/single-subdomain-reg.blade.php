@@ -97,8 +97,6 @@
                 <div class="form-group row g-3">
                     <div class="col-sm-6 "> 
                         <label for="inputCity" class="form-label">IP Address</label>
-                        {{-- <div class="card"> 
-                            <div class="card-body"> --}}
                             @foreach($ips as $index => $ip)
                                 <div class="input-group mb-2">
                                     <input type="text" wire:model="ips.{{ $index }}" placeholder="IP Address" class="form-control @error('ips.'.$index) is-invalid @enderror" aria-label="IP of Nameserver">

@@ -72,14 +72,15 @@
                 <div class="form-group row g-3">                
                     <div class="col-md-6">
                         <label for="inputname" class="form-label">Subdomain Name</label>
-                        @if(!$isSameMapping)
-                            <input type="text" id="inputname" class="form-control @error('subdomainName') is-invalid @enderror" wire:model="subdomainName" placeholder="Enter only Subdomain name ex- abc, abc.xy">
+                
+                         @if(!$isSameMapping)
+                            <input type="text" id="inputname" class="form-control @error('multiSubDomainName.'.($currentStep-2)) is-invalid @enderror" wire:model="{{ 'multiSubDomainName.' . ($currentStep - 2) }}" placeholder="Enter only Subdomain name ex- abc, abc.xy">
                             <div class="invalid-feedback">
-                                @error('subdomainName')
+                                @error('multiSubDomainName.'.($currentStep-2))
                                     {{ $message }}
                                 @enderror
                             </div>
-                        @else
+                        @else 
                             @foreach($multiSubDomainName as $index => $ip)
                                 <div class="input-group mb-2">
                                     <input type="text" wire:model="multiSubDomainName.{{ $index }}" placeholder="Enter only Subdomain name ex- abc, abc.xy" class="form-control @error('multiSubDomainName.'.$index) is-invalid @enderror" aria-label="Enter only Subdomain name ex- abc, abc.xyr">
@@ -188,10 +189,10 @@
             @if ($currentStep > 1 && $currentStep < 12)
                 <button type="button" class="btn btn-dark" wire:click="decreaseStep()">Back</button>
             @endif
-            @if ($currentStep >= 1 && $currentStep < 12)
+            @if ($currentStep >= 1 && $currentStep < 12 && !$isSameMapping)
                 <button type="button" class="btn btn-dark" wire:click="increaseStep()">Next</button>
             @endif
-            @if ($currentStep == 11)
+            @if ( $currentStep == 11 || $isSameMapping )
                 <button type="submit" class="btn btn-dark">Submit</button>
             @endif
         </div>

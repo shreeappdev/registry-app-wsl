@@ -23,7 +23,7 @@ class MultiSubdomainReg extends Component
     public $keepSameMapping;
     public $isSameMapping= false;
     public $multiSubDomainName =[''];
-    //public $subdname;
+ 
 
 
     public function increaseStep(){           
@@ -65,94 +65,134 @@ class MultiSubdomainReg extends Component
         
     }
 
-    public function validateData()
-    {     
-        if($this->currentStep == 1){
+    public function validateData1()
+    {
+
+        $rules = [];
+        $messages = [];
+
+        if ($this->currentStep == 1) {
             $rules = [
                 'selectedDomainid' => 'required',
                 'selectedSigningAthority' => 'required',
                 'selectedsSigningMethod' => 'required'
             ];
             $messages = [
-                'selectedDomainid.required' => 'this field is required',
-                'selectedSigningAthority.required' => 'this field is required',
-                'selectedsSigningMethod.required' => 'this field is required'
+                'selectedDomainid.required' => 'This field is required.',
+                'selectedSigningAthority.required' => 'This field is required.',
+                'selectedsSigningMethod.required' => 'This field is required.'
             ];
-        }  
-        
-        if($this->currentStep > 1 && $this->currentStep <= $this->totalStep){
+        }
+
+        if ( !($this->isSameMapping) && $this->currentStep > 1 && $this->currentStep <= $this->totalStep ) {
             $rules = [
                 'selectedMapping' => 'required',
-                // 'subdomainName' => [
-                //     'required',
-                //     'regex:/^(?!-)(?!.*-$)(?!\.)[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)?$/',
-                //     //  'unique:domain_fld_transactional,subdomainname'
-                // ],
                 'cName' => [
                     'nullable',
                     'required_if:selectedMapping,cname',
                     'regex:/^[a-zA-Z\s]+$/',
-                ]
+                ],
             ];
+
             if ($this->selectedMapping === 'ip') {
                 $this->ips = array_map('trim', $this->ips);
                 $rules['ips'] = ['required', 'array'];
                 $rules['ips.*'] = ['required', 'ip', 'distinct'];
             }
-             if ($this->isSameMapping) {
-                $this->multiSubDomainName = array_map('trim', $this->multiSubDomainName);
-                $rules['multiSubDomainName'] = ['required', 'array'];
-                $rules['multiSubDomainName.*'] = ['required', 'ip', 'distinct'];
-            }
-            $messages = [
-                'subdomainName.required' => 'this field is required',
-                'subdomainName.unique' => 'This subdomain is already registered.',
-                'selectedMapping.required' => 'this field is required',
-                'ips.*.required' => 'this field is required',
-                'ips.*.ip' => 'Each IP must be a valid IPv4 or IPv6 address.',          
-                'ips.*.distinct' => 'Duplicate IP addresses are not allowed.',  
-                'multiSubDomainName.*.required' => 'this field is required',
+
+            $this->multiSubDomainName = array_map('trim', $this->multiSubDomainName);
+            $rules['multiSubDomainName'] = ['required', 'array'];
+            $rules['multiSubDomainName.*'] = [
+                'required',
+                'distinct',
+                'regex:/^(?!-)(?!.*-$)(?!\.)[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)?$/',
             ];
+         
+            $messages = array_merge($messages, [
+                'selectedMapping.required' => 'This field is required.',
+                'ips.*.required' => 'This field is required.',
+                'ips.*.ip' => 'Each IP must be a valid IPv4 or IPv6 address.',
+                'ips.*.distinct' => 'Duplicate IP addresses are not allowed.',
+                'multiSubDomainName.*.required' => 'This field is required.',
+                'multiSubDomainName.*.regex' => 'Enter a valid subdomain (e.g., "abc" or "abc.xyz").',
+                'multiSubDomainName.*.distinct' => 'Duplicate subdomain names are not allowed.',
+            ]);
         }
 
-        // $rules = [
-        //             'selectedDomainid' => 'required',
-        //             'selectedSigningAthority' => 'required',
-        //             'selectedsSigningMethod' => 'required',
-                   // 'selectedMapping' => 'required',
-                    // 'subdomainName' => [
-                    //     'required',
-                    //     'regex:/^(?!-)(?!.*-$)(?!\.)[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)?$/',
-                    //   //  'unique:domain_fld_transactional,subdomainname'
-                    // ],
-                    // 'cName' => [
-                    //     'nullable',
-                    //     'required_if:selectedMapping,cname',
-                    //     'regex:/^[a-zA-Z\s]+$/',
-                    // ],
-               // ];
+        $this->validate($rules, $messages);
+    }
 
-        // if ($this->selectedMapping === 'ip') {
-        //     $this->ips = array_map('trim', $this->ips);
-        //     $rules['ips'] = ['required', 'array'];
-        //     $rules['ips.*'] = ['required', 'ip', 'distinct'];
-
-        // }
+    public function validateData()
+    {
         
-        $messages =      [
-                'selectedDomainid.required' => 'this field is required',
-                'selectedSigningAthority.required' => 'this field is required',
-                'selectedsSigningMethod.required' => 'this field is required',
-                // 'subdomainName.required' => 'this field is required',
-                // 'subdomainName.unique' => 'This subdomain is already registered.',
-                // 'selectedMapping.required' => 'this field is required',
-                // 'ips.*.required' => 'this field is required',
-                // 'ips.*.ip' => 'Each IP must be a valid IPv4 or IPv6 address.',          
-                // 'ips.*.distinct' => 'Duplicate IP addresses are not allowed.',                                                
+        if($this->currentStep == 1){
+            $this->validate($this->rulesForStep1(), $this->messagesForStep1());
+        }elseif($this->isSameMapping){
+            $this->validate($this->rulesForSameMapping(), $this->messagesForSameMapping());                
+        }else{
+
+          
+
+        }
+    }
+
+    private function rulesForSameMapping()
+    {
+        $rules = [
+                'selectedMapping' => 'required',
+                'cName' => [
+                    'nullable',
+                    'required_if:selectedMapping,cname',
+                    'regex:/^[a-zA-Z\s]+$/',
+                ],
+                'multiSubDomainName' => ['required', 'array'],
+                'multiSubDomainName.*' => [
+                    'required',
+                    'distinct',
+                    'regex:/^(?!-)(?!.*-$)(?!\.)[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)?$/',
+                ],
+            ];
+
+            if ($this->selectedMapping === 'ip') {
+                $this->ips = array_map('trim', $this->ips);
+                $rules['ips'] = ['required', 'array'];
+                $rules['ips.*'] = ['required', 'ip', 'distinct'];
+            }
+            $this->multiSubDomainName = array_map('trim', $this->multiSubDomainName);  
+
+        return $rules;      
+    }
+
+    private function messagesForSameMapping(){
+        $messages =  [
+                'selectedMapping.required' => 'This field is required.',
+                'cName.required_if' => 'This field is required.',
+                'cName.regex' => 'CNAME may only contain letters and spaces.',
+                'ips.*.required' => 'This field is required.',
+                'ips.*.ip' => 'Each IP must be a valid IPv4 or IPv6 address.',
+                'ips.*.distinct' => 'Duplicate IP addresses are not allowed.',
+                'multiSubDomainName.*.required' => 'This field is required.',
+                'multiSubDomainName.*.regex' => 'Enter a valid subdomain (e.g., "abc" or "abc.xyz").',
+                'multiSubDomainName.*.distinct' => 'Duplicate subdomain names are not allowed.',
         ];
 
-        $this->validate($rules,$messages );
-     
+        return $messages;
+    }
+
+    private function rulesForStep1(){
+        return [
+                'selectedDomainid' => 'required',
+                'selectedSigningAthority' => 'required',
+                'selectedsSigningMethod' => 'required'
+            ];
+    }
+
+    private function messagesForStep1(){
+        return [
+                'selectedDomainid.required' => 'This field is required.',
+                'selectedSigningAthority.required' => 'This field is required.',
+                'selectedsSigningMethod.required' => 'This field is required.'
+            ];
     }
 
     public function updatedKeepSameMapping($value){
@@ -165,6 +205,13 @@ class MultiSubdomainReg extends Component
 
     public function updatedSelectedDomainid($value){
         $this->signingAuthority = Customdbresults::domainDetails($value,['orgContactDetails', 'adminContactDetails']);           
+    }
+
+    public function register()
+    {
+      //  dd($this->multiSubDomainName);
+        $this->resetErrorBag();
+        $this->validateData();
     }
 
     public function getActiveDomainProperty(){
