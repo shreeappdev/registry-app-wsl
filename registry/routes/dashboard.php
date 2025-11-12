@@ -25,6 +25,7 @@ use App\Livewire\Backend\Domaincancel\SubmitDomainCancelLetter;
 use App\Livewire\Backend\DomainTransfer\GenerateTransferLetter;
 use App\Livewire\Backend\DomainTransfer\DomainTransferLetterSubmit;
 use App\Livewire\Backend\Domainregistration\SubmitRegistrationLetter;
+use App\Livewire\Backend\Subdomain\Registration\MultiSubdomainReg;
 use App\Livewire\Backend\Subdomain\Registration\SingleSubdomainReg;
 use App\Livewire\Backend\Subdomain\SubmitLetter\SingleSubdomainSubmitLetter;
 
@@ -43,10 +44,11 @@ use App\Livewire\Backend\Subdomain\SubmitLetter\SingleSubdomainSubmitLetter;
    /** Single SubDomain Registration*/
    Route::get('/single-subdomain-registration', SingleSubdomainReg::class)->name('single_subdomain_registration');
    Route::get('/single-subdomain-submitletter', SingleSubdomainSubmitLetter::class)->name('single_subdomain_submitletter');
+   /** Single SubDomain Registration*/
+   Route::get('/multi-subdomain-registration', MultiSubdomainReg::class)->name('multi_subdomain_registration');
 
 
-
-   Route::get('/subdomain-registration', SubdomainRegistration::class)->name('subdomain_registration');
+   //Route::get('/subdomain-registration', SubdomainRegistration::class)->name('subdomain_registration');
    // Route::get('/multiple-subdomain-registration/{id}', MultipleSubdomainRegister::class)->name('multiplesubdomain_register');
 
    Route::get('/multiplesubdomain-registration', MultipleSubdomainRegistration::class)->name('bulksubdomain_register');
