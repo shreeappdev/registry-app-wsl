@@ -2,6 +2,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h4 class="h3 mb-0 text-gray-800">Register Multiple SubDomain</h4>
     </div>
+      
     <form class="row needs-validation" method= "post" wire:submit.prevent="register" novalidate>
          @csrf
          @if ($currentStep == 1)
@@ -74,12 +75,21 @@
                         <label for="inputname" class="form-label">Subdomain Name</label>
                 
                          @if(!$isSameMapping)
-                            <input type="text" id="inputname" class="form-control @error('multiSubDomainName.'.($currentStep-2)) is-invalid @enderror" wire:model="{{ 'multiSubDomainName.' . ($currentStep - 2) }}" placeholder="Enter only Subdomain name ex- abc, abc.xy">
-                            <div class="invalid-feedback">
+                            {{-- <input type="text" id="inputname" class="form-control @error('multiSubDomainName.'.($currentStep-2)) is-invalid @enderror" wire:model="{{ 'multiSubDomainName.' . ($currentStep - 2) }}" placeholder="Enter only Subdomain name ex- abc, abc.xy"> --}}
+                             {{-- <div class="invalid-feedback">
                                 @error('multiSubDomainName.'.($currentStep-2))
                                     {{ $message }}
                                 @enderror
-                            </div>
+                            </div> --}}
+
+                            <input type="text" wire:key="subdomain-input-{{ $currentStep }}"  wire:model="stepsData.{{$currentStep}}.subdomain" class="form-control @error('stepsData.'.$currentStep. '.subdomain') is-invalid @enderror"
+                             placeholder="Enter subdomain" />
+
+                             <div class="invalid-feedback">
+                                @error('stepsData.' .$currentStep. '.subdomain')
+                                    {{ $message }}
+                                @enderror
+                            </div>                          
                         @else 
                             @foreach($multiSubDomainName as $index => $ip)
                                 <div class="input-group mb-2">
@@ -110,7 +120,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="inputmapping" class="form-label">Mapping</label>
-                            <select id="inputmapping" class="form-control @error('selectedMapping') is-invalid @enderror" wire:model.live="selectedMapping">
+                            <select id="inputmapping" class="form-control @error('selectedMapping') is-invalid @enderror" wire:key="mapping-input-{{ $currentStep }}" wire:model.live="selectedMapping">
                                 <option value="" selected>Choose...</option>
                                 <option value="cname">CNAME</option>
                                 <option value="ip">IP</option>
@@ -121,6 +131,7 @@
                                 @enderror
                             </div>
                     </div>
+                    @if($currentStep == 2)
                     <div class="col-md-3 mt-5">
                          <div class="form-check">
                             <input type="checkbox" 
@@ -132,15 +143,17 @@
                             </label>
                         </div>
                     </div>
+                    @endif
                 </div>
                 {{-- @if($mappingType == 'ip') --}}
                 <div class="form-group row g-3">
                     @if($mappingType == 'cname')
+                    @php $cname = $isSameMapping ? 'cName' :'stepsData.' . ($currentStep) . '.cName'; @endphp
                         <div class="col-md-6">
                             <label for="inputcname" class="form-label">CNAME</label>
-                            <input type="text" id="inputcname" class="form-control @error('cName') is-invalid @enderror" wire:model="cName" placeholder="Enter enter cname">
+                            <input type="text" id="inputcname" class="form-control @error($cname) is-invalid @enderror" wire:key="cname-input-{{ $currentStep }}" wire:model="{{ $cname }}" placeholder="Enter enter cname">
                             <div class="invalid-feedback">
-                                @error('cName')
+                                @error($cname)
                                     {{ $message }}
                                 @enderror
                             </div>
@@ -149,8 +162,7 @@
                     @if($mappingType == 'ip')
                         <div class="col-sm-6 "> 
                             <label for="inputCity" class="form-label">IP Address</label>
-                            {{-- <div class="card"> 
-                                <div class="card-body"> --}}
+                            @if($isSameMapping)
                                 @foreach($ips as $index => $ip)
                                     <div class="input-group mb-2">
                                         <input type="text" wire:model="ips.{{ $index }}" placeholder="IP Address" class="form-control @error('ips.'.$index) is-invalid @enderror" aria-label="IP of Nameserver">
@@ -176,23 +188,49 @@
                                         @enderror
                                     </div>
                                 @endforeach
-                                {{-- </div>
-                            </div> --}}
+                            @else
+                            @php $stepsips = $stepsData[$currentStep]['ips'] ?? ['']; @endphp
+                                @foreach($stepsips as $index => $ip)
+                                    <div class="input-group mb-2">
+                                        <input type="text" wire:key="stepsip-input-{{ $currentStep }}" wire:model="stepsData.{{ $currentStep }}.ips.{{ $index }}" placeholder="IP Address" class="form-control @error('stepsData.' . $currentStep . '.ips.' . $index) is-invalid @enderror" aria-label="IP of Nameserver">
+                                        @if ($loop->first && count($stepsips) < 5)
+                                            <span class="input-group-text"
+                                                wire:click="addEntry('stepsip')"
+                                                style="cursor:pointer;">
+                                                <i class="fa fa-plus-circle" style="color:green; font-size:20px;"></i>
+                                            </span>
+                                        @endif
+
+                                        <!-- Remove IP (if more than 1) -->
+                                        @if ($index > 0)
+                                            <span class="input-group-text"
+                                                wire:click="removeEntry('stepsip',{{ $index }})"
+                                                style="cursor:pointer;">
+                                                <i class="fa fa-minus-circle" style="color:red; font-size:20px;"></i>
+                                            </span>
+                                        @endif
+
+                                        @error('stepsData.' . $currentStep . '.ips.' . $index)
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                @endforeach
+                            @endif 
                         </div>
                     @endif
                 </div>
                 {{-- @endif --}}
             </div>
            </div>
-         @endif
+        @endif
         <div class="col-12 mt-4">
             @if ($currentStep > 1 && $currentStep < 12)
                 <button type="button" class="btn btn-dark" wire:click="decreaseStep()">Back</button>
             @endif
-            @if ($currentStep >= 1 && $currentStep < 12 && !$isSameMapping)
+            @if ($currentStep > 0 && $currentStep < 12 && !$isSameMapping)
                 <button type="button" class="btn btn-dark" wire:click="increaseStep()">Next</button>
             @endif
-            @if ( $currentStep == 11 || $isSameMapping )
+            @if ( $currentStep == 11 || $isSameMapping || $currentStep > 2 )
                 <button type="submit" class="btn btn-dark">Submit</button>
             @endif
         </div>
