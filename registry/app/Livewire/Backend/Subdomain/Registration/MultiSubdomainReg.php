@@ -3,10 +3,14 @@
 namespace App\Livewire\Backend\Subdomain\Registration;
 
 use Livewire\Component;
-use App\Models\Domain;
 use App\Helpers\Customdbresults;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use App\Models\SubdomainFldTransactional;
+use App\Models\Domain;
+use App\Models\Contact;
+// use Illuminate\Support\Str;
 
 class MultiSubdomainReg extends Component
 {
@@ -40,6 +44,7 @@ class MultiSubdomainReg extends Component
     // }
 
     public function increaseStep(){ 
+       // dd('SUBD' .date('dmy'). bin2hex(random_bytes(8)));
 
         $this->resetErrorBag();
         $this->validateData();  
@@ -307,10 +312,84 @@ class MultiSubdomainReg extends Component
        
         $this->resetErrorBag();
         $this->validateData();
-         dd($this->currentStep,$this->stepsData);
+        //dd($this->multiSubDomainName,$this->ips, $this->cName);
+        // dd($this->currentStep,$this->stepsData);
         try{
-            if($this->isSameMapping){
+            // if($this->isSameMapping){
+            //     SubdomainFldTransactional::
+            // }
 
+            // $subdomainid = 'SUBD'.date('dmy').date('his');
+
+            // $subdomainid = 'SUBD-' . Str::ulid();
+            $domainname = Domain::where('domainid',$this->selectedDomainid)->value('domainname');
+            $authorityDetails = Contact::selectedDetails($this->selectedSigningAthority);
+            $subdomainname = $this->subdomainName.'.'.$domainname;
+
+            // check,  Is subdomain already exist
+            $exists = SubdomainFldTransactional::where('subdomainname', $subdomainname)->exists();
+            if ($exists) {
+                return $this->addError('subdomainName', 'This subdomain already exists.');
+            }
+            if(!($this->isSameMapping) && !empty($this->stepsData)){
+                foreach($this->stepsData as $key => $value){
+                  //  $subdomainid = 'SUBD' .date('dmy'). bin2hex(random_bytes(8));
+                   $subdomainname = !empty($value['subdomain'])? $value['subdomain'].'.'.$domainname : '';
+                    SubdomainFldTransactional::create([
+                        'subdomainid'=> 'SUBD' .date('dmy'). bin2hex(random_bytes(8)),
+                        'subdomainname' => $subdomainname,
+                        'domainid' => $this->selectedDomainid,
+                        'multipleips' => !empty($value['ips'])? serialize($value['ips']):serialize([]),
+                        'multiplecname' => !empty($value['cName'])? serialize([$value['cName']]) : serialize([]), 
+                        'signedby' => $this->selectedSigningAthority          
+                    ]);
+                }             
+            }elseif($this->isSameMapping && !empty($this->multiSubDomainName)){
+                foreach($this->multiSubDomainName as $value){
+                  //  $subdomainid = 'SUBD' .date('dmy'). bin2hex(random_bytes(8));
+                  //  $subdomainname = !empty($value['subdomain'])? $value['subdomain'].'.'.$domainname : '';
+                    SubdomainFldTransactional::create([
+                        'subdomainid'=> 'SUBD' .date('dmy'). bin2hex(random_bytes(8)),
+                        'subdomainname' => $value,
+                        'domainid' => $this->selectedDomainid,
+                        'multipleips' =>serialize($this->ips),
+                        'multiplecname' => serialize([$this->cName]), 
+                        'signedby' => $this->selectedSigningAthority          
+                    ]);
+                } 
+            }
+               
+
+            // generate letter st 
+            
+            if( $this->selectedsSigningMethod == 'generateletter'){
+                $data = [
+                'domainname' => $domainname,
+                'authorityName' => (!empty($authorityDetails) && $authorityDetails->c_name) ? $authorityDetails->c_name :'',
+                'authorityDesg' => (!empty($authorityDetails) && $authorityDetails->designation) ? $authorityDetails->designation :'',
+                'subdomainname' => $subdomainname,
+                'isSameMapping' => $this->isSameMapping,
+                'ips' =>$this->ips,
+                'cname' => $this->cName,
+                'date' => date('m/d/Y')
+
+                ];
+
+                $pdf = Pdf::loadView('livewire.backend.Letterformat.subdomain_reg_letter',$data);
+                $filename = letterName($domainname,$this->selectedDomainid,'sub_reg_multi');           
+                $path = storage_path("app/public/registrationletters/generated/{$filename}");           
+                $pdf->save($path);
+                $link = Storage::url("registrationletters/generated/{$filename}");
+            
+                $this->dispatch('subDomainReg', [
+                    'type'  => 'success',
+                    'title' => 'Letter Generated',
+                    'text'  => $subdomainname,
+                    'date'  => now()->format('Y-m-d'),
+                    'html'  => "<p>Annexure I and II has been generated successfully.<br>
+                                <a href='{$link}' target='_blank'>Download Letter.</a><br>
+                                </p>",
+                ]);    
             }
 
         }catch(\Exception $e){

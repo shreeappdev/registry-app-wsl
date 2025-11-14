@@ -22,8 +22,6 @@ class SingleSubdomainReg extends Component
     public $subdomainName;
     public $signingAuthority;
     public $cName;
-   
-
     
     public function updatedSelectedDomainid($value){
         $this->signingAuthority = Customdbresults::domainDetails($this->selectedDomainid,['orgContactDetails', 'adminContactDetails']);           
