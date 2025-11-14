@@ -20,7 +20,7 @@ class MultiSubdomainReg extends Component
     public $selectedDomainid;
     public $selectedSigningAthority;
     public $selectedsSigningMethod;
-    public $subdomainName;
+    // public $subdomainName;
     public $selectedMapping;
     public $mappingType;
     public $ips = [''];
@@ -53,8 +53,8 @@ class MultiSubdomainReg extends Component
         if($this->currentStep > $this->totalStep){
             $this->currentStep = $this->totalStep;
         } 
-        $this->selectedMapping = '';
-        $this->mappingType = '';
+        // $this->selectedMapping = '';
+        // $this->mappingType = '';
     }
 
     public function decreaseStep(){
@@ -324,17 +324,24 @@ class MultiSubdomainReg extends Component
             // $subdomainid = 'SUBD-' . Str::ulid();
             $domainname = Domain::where('domainid',$this->selectedDomainid)->value('domainname');
             $authorityDetails = Contact::selectedDetails($this->selectedSigningAthority);
-            $subdomainname = $this->subdomainName.'.'.$domainname;
+           // $subdomainname = $this->subdomainName.'.'.$domainname;
 
             // check,  Is subdomain already exist
-            $exists = SubdomainFldTransactional::where('subdomainname', $subdomainname)->exists();
-            if ($exists) {
-                return $this->addError('subdomainName', 'This subdomain already exists.');
-            }
+            // $exists = SubdomainFldTransactional::where('subdomainname', $subdomainname)->exists();
+            // if ($exists) {
+            //     return $this->addError('subdomainName', 'This subdomain already exists.');
+            // }
             if(!($this->isSameMapping) && !empty($this->stepsData)){
-                foreach($this->stepsData as $key => $value){
+                foreach($this->stepsData as $index => $value){
+                    $subdomainname = !empty($value['subdomain'])? $value['subdomain'].'.'.$domainname : '';
+                     // check,  Is subdomain already exist
+                    $exists = SubdomainFldTransactional::where('subdomainname', $subdomainname)->exists();
+                    if ($exists) {
+                        return session()->flash("error", "Subdomain : $subdomainname  already exists at subdomain ".$index-1);
+
+                       // return $this->addError("stepsData.$index.subdomain", "This $subdomainname subdomain already exists.");
+                    }
                   //  $subdomainid = 'SUBD' .date('dmy'). bin2hex(random_bytes(8));
-                   $subdomainname = !empty($value['subdomain'])? $value['subdomain'].'.'.$domainname : '';
                     SubdomainFldTransactional::create([
                         'subdomainid'=> 'SUBD' .date('dmy'). bin2hex(random_bytes(8)),
                         'subdomainname' => $subdomainname,
@@ -345,9 +352,15 @@ class MultiSubdomainReg extends Component
                     ]);
                 }             
             }elseif($this->isSameMapping && !empty($this->multiSubDomainName)){
-                foreach($this->multiSubDomainName as $value){
+                foreach($this->multiSubDomainName as $index=>$value){
                   //  $subdomainid = 'SUBD' .date('dmy'). bin2hex(random_bytes(8));
                   //  $subdomainname = !empty($value['subdomain'])? $value['subdomain'].'.'.$domainname : '';
+                   // check,  Is subdomain already exist
+                    $exists = SubdomainFldTransactional::where('subdomainname', $value)->exists();
+                   // dd( $exists );
+                    if ($exists) {
+                        return $this->addError("multiSubDomainName.$index", "This $value subdomain already exists.");
+                    }
                     SubdomainFldTransactional::create([
                         'subdomainid'=> 'SUBD' .date('dmy'). bin2hex(random_bytes(8)),
                         'subdomainname' => $value,
@@ -367,7 +380,7 @@ class MultiSubdomainReg extends Component
                 'domainname' => $domainname,
                 'authorityName' => (!empty($authorityDetails) && $authorityDetails->c_name) ? $authorityDetails->c_name :'',
                 'authorityDesg' => (!empty($authorityDetails) && $authorityDetails->designation) ? $authorityDetails->designation :'',
-                'subdomainname' => $subdomainname,
+                'subdomainnames' => $this->isSameMapping ? $this->multiSubDomainName : $this->stepsData,
                 'isSameMapping' => $this->isSameMapping,
                 'ips' =>$this->ips,
                 'cname' => $this->cName,
@@ -375,16 +388,16 @@ class MultiSubdomainReg extends Component
 
                 ];
 
-                $pdf = Pdf::loadView('livewire.backend.Letterformat.subdomain_reg_letter',$data);
+                $pdf = Pdf::loadView('livewire.backend.Letterformat.subdomain_multi_reg_letter',$data);
                 $filename = letterName($domainname,$this->selectedDomainid,'sub_reg_multi');           
                 $path = storage_path("app/public/registrationletters/generated/{$filename}");           
                 $pdf->save($path);
                 $link = Storage::url("registrationletters/generated/{$filename}");
             
-                $this->dispatch('subDomainReg', [
+                $this->dispatch('subDomainMultiReg', [
                     'type'  => 'success',
                     'title' => 'Letter Generated',
-                    'text'  => $subdomainname,
+                   // 'text'  => $subdomainname,
                     'date'  => now()->format('Y-m-d'),
                     'html'  => "<p>Annexure I and II has been generated successfully.<br>
                                 <a href='{$link}' target='_blank'>Download Letter.</a><br>
@@ -393,7 +406,7 @@ class MultiSubdomainReg extends Component
             }
 
         }catch(\Exception $e){
-            Log::error('Transaction failed: ' . $e->getMessage());
+            Log::error('Error: ' . $e->getMessage());
         }
     }
 

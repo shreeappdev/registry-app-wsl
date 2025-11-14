@@ -68,7 +68,11 @@
             <div class="card-header bg-primary text-white shadow">
                 Subdomain {{ $currentStep - 1 }}
             </div>
-           
+            @if (session()->has('error'))
+                <div class="alert alert-danger mt-2">
+                    {{ session('error') }}
+                </div>
+            @endif
             <div class="card-body">
                 <div class="form-group row g-3">                
                     <div class="col-md-6">
@@ -239,7 +243,7 @@
 </div>
 @script
     <script>
-        window.addEventListener('subDomainReg', (event) => {
+        window.addEventListener('subDomainMultiReg', (event) => {
             let data = event.detail[0];
             Swal.fire({
                 position: 'center',
